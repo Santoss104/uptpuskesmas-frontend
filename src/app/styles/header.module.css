@@ -1,0 +1,15 @@
+/* header.module.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 24px 0;
+}
+.logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #4f4f8f;
+}
+.userIcon {
+  color: #4f4f8f;
+}

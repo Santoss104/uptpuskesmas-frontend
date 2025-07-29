@@ -1,0 +1,176 @@
+.dashboard-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #f7e6e6 100%);
+  padding: 40px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #23234c;
+  margin-bottom: 32px;
+}
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px #e8eafc55;
+  padding: 20px 36px;
+  width: 270px;
+  margin-bottom: 32px;
+}
+.stat-icon {
+  font-size: 2.5rem;
+  color: #ffb300;
+  background: #fff8e1;
+  border-radius: 12px;
+  padding: 8px;
+}
+.stat-info-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #23234c;
+}
+.stat-info-desc {
+  color: #ffb300;
+  font-weight: 600;
+}
+.dashboard-main {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+.table-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px #e8eafc55;
+  padding: 32px;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+.table-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #23234c;
+  margin-bottom: 16px;
+}
+.dashboard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.dashboard-table th, .dashboard-table td {
+  padding: 10px 14px;
+  text-align: left;
+}
+.dashboard-table th {
+  background: #f5f7fa;
+  color: #23234c;
+  font-weight: 600;
+}
+.dashboard-table tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+.dashboard-table tr:hover {
+  background: #f5f7fa;
+}
+.dashboard-table .link {
+  color: #6c63ff;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.badge {
+  padding: 4px 16px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: inline-block;
+}
+.badgeFever { background: #ff6f61; }
+.badgeCholera { background: #ffb300; }
+.action-btn {
+  background: #e8eafc;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-right: 4px;
+  cursor: pointer;
+}
+.action-btn.delete {
+  background: #ffeaea;
+}
+.action-btn .material-icons {
+  font-size: 1.1rem;
+  vertical-align: middle;
+}
+.action-btn.edit .material-icons { color: #6c63ff; }
+.action-btn.delete .material-icons { color: #ff6f61; }
+.calendar-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px #e8eafc55;
+  padding: 32px;
+  width: 320px;
+}
+.calendar-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #23234c;
+  margin-bottom: 16px;
+}
+.calendar-table {
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+}
+.calendar-table th {
+  color: #b0b0b0;
+  font-weight: 500;
+  padding-bottom: 6px;
+}
+.calendar-table td {
+  padding: 6px 0;
+  font-size: 1rem;
+}
+.calendar-table .today {
+  background: #e8eafc;
+  color: #6c63ff;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #f7e6e6 100%);
+}
+
+.main {
+  flex: 1;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.pagination-btn {
+  background: #f3f4f6;
+  color: #888;
+  border-radius: 6px;
+  border: none;
+  padding: 4px 12px;
+  margin-right: 4px;
+  cursor: pointer;
+}
+.pagination-btn.active {
+  background: #a78bfa;
+  color: #fff;
+}

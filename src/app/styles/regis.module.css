@@ -1,0 +1,97 @@
+.bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #e8eafc 0%, #f7e6e6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 350px;
+  padding: 0;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: contain;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #23234c;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+.label {
+  align-self: flex-start;
+  font-size: 0.95rem;
+  color: #23234c;
+  margin-bottom: 2px;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e8eafc;
+  background: #f5f7fa;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.button {
+  width: 100%;
+  background: #0094ff;
+  color: #fff;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.button:hover {
+  background: #0077cc;
+}
+
+.loginLink {
+  width: 100%;
+  text-align: center;
+  color: #23234c;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+.loginText {
+  font-weight: bold;
+  color: #23234c;
+  cursor: pointer;
+}
