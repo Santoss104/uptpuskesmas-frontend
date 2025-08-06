@@ -1,56 +1,170 @@
 .sidebar {
-  width: 220px;
-  background: linear-gradient(135deg, #e7eafd 60%, #f7f8fa 100%);
-  padding: 32px 0 0 0;
+  width: 280px;
+  background: #f8f9fc;
+  padding: 24px 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   min-height: 100vh;
-  box-shadow: 2px 0 12px #e7eafd44;
+  border-right: 1px solid #e5e7eb;
 }
+
 .profile {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-bottom: 32px;
+  gap: 12px;
+  margin-bottom: 40px;
+  padding: 16px 0;
 }
+
 .avatar {
-  width: 56px;
-  height: 56px;
-  background: #fff;
+  width: 48px;
+  height: 48px;
+  background: #e0e7ff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  margin-bottom: 8px;
-  box-shadow: 0 2px 8px #e7eafd44;
+  font-size: 1.5rem;
+  flex-shrink: 0;
 }
-.role {
-  color: #b0b3d6;
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.userName {
+  color: #1f2937;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 16px;
+  line-height: 1.2;
 }
+
+.role {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav {
+  flex: 1;
+}
+
 .navList {
   list-style: none;
   padding: 0;
-  margin-top: 16px;
-  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
+
 .navItem {
-  padding: 12px 32px;
-  margin-bottom: 8px;
-  color: #4f4f8f;
-  font-weight: 500;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.navLink {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 12px 16px;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-radius: 8px;
 }
-.active,
-.navItem:hover {
-  background: #e7eafd;
-  color: #2d2d6b;
+
+.navIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.navItem:hover .navLink {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.active .navLink {
+  background: #e0e7ff;
+  color: #3730a3;
+  font-weight: 600;
+}
+
+.active .navIcon {
+  color: #3730a3;
+}
+
+/* Logout Modal Styles */
+.logoutModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.logoutContent {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  min-width: 320px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.logoutText {
+  font-size: 18px;
+  color: #1f2937;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.logoutButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirmButton {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.confirmButton:hover {
+  background: #b91c1c;
+}
+
+.cancelButton {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cancelButton:hover {
+  background: #e5e7eb;
 }

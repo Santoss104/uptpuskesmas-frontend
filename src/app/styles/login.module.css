@@ -1,86 +1,192 @@
-  .bg {
-    min-height: 100vh;
-    width: 100vw;
-    background: linear-gradient(135deg, #e8eafc 0%, #f7e6e6 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.bg {
+  height: 100vh;
+  width: 100vw;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  cursor: default;
+}
+
+.form {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 1;
+  outline: none;
+}
+
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  cursor: default;
+  pointer-events: none;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 5px 0;
+  line-height: 1.3;
+  letter-spacing: 0.5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 15px 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  border: 2px solid #4a90e2;
+}
+
+.input:not(:focus) {
+  border: 2px solid transparent;
+}
+
+.input::placeholder {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  outline: none;
+}
+
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+.button:hover {
+  background: linear-gradient(135deg, #357abd 0%, #2a6a9e 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+}
+
+.switchText {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.switchText a {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.switchText a:hover {
+  color: #357abd;
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
   .form {
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 350px;
-    padding: 0;
+    padding: 30px 25px;
+    margin: 20px;
+    max-width: calc(100vw - 40px);
   }
-  .logoSection {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 32px;
-  }
-  .logo {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: #fff;
-    object-fit: contain;
-  }
+
   .title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #23234c;
-    line-height: 1.2;
+    font-size: 14px;
   }
+
   .subtitle {
-    font-size: 0.95rem;
-    color: #888;
-    margin-top: 2px;
+    font-size: 12px;
   }
-  .label {
-    align-self: flex-start;
-    font-size: 0.95rem;
-    color: #23234c;
-    margin-bottom: 2px;
-    margin-top: 12px;
-    font-weight: 500;
-  }
-  .input {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #e8eafc;
-    background: #f5f7fa;
-    margin-bottom: 8px;
-    font-size: 1rem;
-  }
-  .button {
-    width: 100%;
-    background: #0094ff;
-    color: #fff;
-    padding: 10px 0;
-    border-radius: 8px;
-    border: none;
-    font-weight: bold;
-    font-size: 1rem;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .button:hover {
-    background: #0077cc;
-  }
-  .loginLink {
-    width: 100%;
-    text-align: center;
-    color: #23234c;
-    font-size: 0.95rem;
-    margin-top: 8px;
-  }
-  .loginText {
-    font-weight: bold;
-    color: #23234c;
-    cursor: pointer;
-  }
+}
+
+/* Fix untuk menghilangkan cursor dan outline yang tidak diinginkan */
+.form * {
+  outline: none;
+}
+
+.form div:not(.logoSection) {
+  cursor: default;
+}
+
+.form h2,
+.form p,
+.form label {
+  cursor: default;
+  user-select: none;
+}
+
+/* Pastikan hanya input dan button yang bisa difokus */
+.form *:not(.input):not(.button):not(a) {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

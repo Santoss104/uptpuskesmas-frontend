@@ -50,13 +50,11 @@ export default function Dashboard() {
           <table className={styles["dashboard-table"]}>
             <thead>
               <tr>
-                <th>#</th>
+                <th>No. </th>
                 <th>Patient Name</th>
                 <th>Alamat</th>
                 <th>Nomor Pendaftaran</th>
                 <th>Tanggal Lahir</th>
-                <th>Status</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -71,27 +69,6 @@ export default function Dashboard() {
                   </td>
                   <td>{p.nomor}</td>
                   <td>{p.lahir}</td>
-                  <td>
-                    <span
-                      className={
-                        styles["badge"] +
-                        " " +
-                        (p.status === "Fever"
-                          ? styles["badgeFever"]
-                          : styles["badgeCholera"])
-                      }
-                    >
-                      {p.status}
-                    </span>
-                  </td>
-                  <td>
-                    <button className={`${styles["action-btn"]} ${styles["edit"]}`}>
-                      <span className="material-icons">edit</span>
-                    </button>
-                    <button className={`${styles["action-btn"]} ${styles["delete"]}`}>
-                      <span className="material-icons">delete</span>
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
