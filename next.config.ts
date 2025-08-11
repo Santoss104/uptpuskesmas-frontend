@@ -4,10 +4,12 @@ const isDev = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
   // Output configuration for Netlify (production only)
-  ...(isDev ? {} : { 
-    output: "export", 
-    trailingSlash: false, // Remove trailing slash for cleaner URLs
-  }),
+  ...(isDev
+    ? {}
+    : {
+        output: "export",
+        trailingSlash: false, // Remove trailing slash for cleaner URLs
+      }),
 
   // Development optimizations
   ...(isDev && {
@@ -39,14 +41,11 @@ const nextConfig: NextConfig = {
 
   // Performance optimizations
   compiler: {
-    removeConsole: isDev ? false : {
-      exclude: ['error', 'warn'], // Keep error/warn logs in production
-    },
-  },
-
-  // Reduce bundle size
-  experimental: {
-    optimizeCss: true, // Optimize CSS loading
+    removeConsole: isDev
+      ? false
+      : {
+          exclude: ["error", "warn"], // Keep error/warn logs in production
+        },
   },
 };
 
