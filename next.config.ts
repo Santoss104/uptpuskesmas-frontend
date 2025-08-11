@@ -1,9 +1,20 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
-  // Output configuration for Netlify
-  output: "export",
-  trailingSlash: true,
+  // Output configuration for Netlify (production only)
+  ...(isDev ? {} : { output: "export", trailingSlash: true }),
+
+  // Development optimizations
+  ...(isDev && {
+    eslint: {
+      ignoreDuringBuilds: true, // Skip ESLint during dev builds
+    },
+    typescript: {
+      ignoreBuildErrors: true, // Skip TypeScript checking during dev builds
+    },
+  }),
 
   // Disable image optimization for static export
   images: {

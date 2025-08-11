@@ -1,6 +1,7 @@
 // API Configuration for Frontend
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://puskesmas-backend-api.fly.dev/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://puskesmas-backend-api.fly.dev/api/v1";
 
 // Type definitions
 interface User {
@@ -187,9 +188,13 @@ class ApiClient {
     email: string;
     password: string;
   }): Promise<LoginResponse> {
+    const startTime = performance.now();
+
     console.log("🌐 ApiClient: Sending login request with credentials:", {
       email: credentials.email,
       hasPassword: !!credentials.password,
+      apiUrl: this.baseURL,
+      timestamp: new Date().toISOString(),
     });
 
     const url = `${this.baseURL}/auth/login`;
@@ -208,7 +213,15 @@ class ApiClient {
       const response = await fetch(url, config);
       const data = await response.json();
 
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
       if (!response.ok) {
+        console.error("❌ Login failed:", {
+          duration: `${duration.toFixed(2)}ms`,
+          status: response.status,
+          message: data.message,
+        });
         throw new Error(data.message || "Login failed");
       }
 
@@ -218,11 +231,20 @@ class ApiClient {
         hasAccessToken: !!data.accessToken,
         hasRefreshToken: !!data.refreshToken,
         message: data.message,
+        duration: `${duration.toFixed(2)}ms`,
+        timestamp: new Date().toISOString(),
       });
 
       return data as LoginResponse;
     } catch (error) {
-      console.error("API Error:", error);
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
+      console.error("API Error:", {
+        error,
+        duration: `${duration.toFixed(2)}ms`,
+        url,
+      });
 
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         throw new Error(
