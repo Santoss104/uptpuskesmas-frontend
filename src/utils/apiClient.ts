@@ -156,6 +156,8 @@ class ApiClient {
         ...options.headers,
       },
       credentials: "include",
+      // Add timeout
+      signal: AbortSignal.timeout(30000), // 30 seconds timeout
     };
 
     try {
@@ -166,7 +168,13 @@ class ApiClient {
 
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         throw new Error(
-          "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan di port 5000."
+          "Tidak dapat terhubung ke server. Pastikan koneksi internet Anda stabil."
+        );
+      }
+
+      if (error instanceof DOMException && error.name === "AbortError") {
+        throw new Error(
+          "Request timeout. Server membutuhkan waktu terlalu lama untuk merespons."
         );
       }
 
