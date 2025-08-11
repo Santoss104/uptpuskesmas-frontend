@@ -28,7 +28,7 @@ interface PaginationData {
   hasPrevPage: boolean;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 25; // Increased for better performance with large datasets
 const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 export default function PatientList() {
@@ -540,7 +540,10 @@ export default function PatientList() {
               <button onClick={openModal} className={styles["add-button"]}>
                 + Tambah Pasien
               </button>
-              <button onClick={handleExport} className={styles["export-button"]}>
+              <button
+                onClick={handleExport}
+                className={styles["export-button"]}
+              >
                 Export Excel
               </button>
               <button
