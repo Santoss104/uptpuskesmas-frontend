@@ -1,6 +1,6 @@
 // API Configuration for Frontend
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://puskesmas-backend-api.fly.dev/api/v1";
 
 // Type definitions
 interface User {
@@ -156,8 +156,8 @@ class ApiClient {
         ...options.headers,
       },
       credentials: "include",
-      // Add timeout
-      signal: AbortSignal.timeout(30000), // 30 seconds timeout
+      // Add timeout - shorter for better UX
+      signal: AbortSignal.timeout(15000), // 15 seconds timeout
     };
 
     try {
@@ -200,6 +200,8 @@ class ApiClient {
       },
       credentials: "include",
       body: JSON.stringify(credentials),
+      // Shorter timeout for login
+      signal: AbortSignal.timeout(10000), // 10 seconds timeout
     };
 
     try {
@@ -224,7 +226,13 @@ class ApiClient {
 
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         throw new Error(
-          "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan di port 5000."
+          "Tidak dapat terhubung ke server. Pastikan koneksi internet Anda stabil."
+        );
+      }
+
+      if (error instanceof DOMException && error.name === "AbortError") {
+        throw new Error(
+          "Login timeout. Server membutuhkan waktu terlalu lama untuk merespons."
         );
       }
 
