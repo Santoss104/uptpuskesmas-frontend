@@ -1,4 +1,3 @@
-// src/app/registrasi/layout.tsx
 export default function RegistrasiLayout({
   children,
 }: {

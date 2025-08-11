@@ -30,7 +30,9 @@ export default function Dashboard() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [statistics, setStatistics] = useState<PatientStatistics | null>(null);
   const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,7 +44,6 @@ export default function Dashboard() {
   ];
 
   useEffect(() => {
-    // Only fetch data if user is authenticated and not loading
     if (!authLoading && !isAuthenticated) {
       setLoading(false);
       return;
@@ -53,7 +54,6 @@ export default function Dashboard() {
         try {
           setLoading(true);
 
-          // Fetch recent patients (limit to first 5)
           const patientsResponse = await apiClient.getPatients({
             page: 1,
             limit: 5,
@@ -74,7 +74,6 @@ export default function Dashboard() {
           // Fetch calendar data
           const calendarResponse = await apiClient.getCalendar(currentMonth, currentYear);
           if (calendarResponse.success && calendarResponse.data) {
-            // Flatten the weeks structure to get all days
             const allDays: CalendarDay[] = [];
             if (calendarResponse.data.weeks) {
               calendarResponse.data.weeks.forEach((week: CalendarWeek) => {
@@ -198,7 +197,6 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {calendarData && calendarData.length > 0 ? (
-                // Group days into weeks (7 days each)
                 Array.from({ length: Math.ceil(calendarData.length / 7) }, (_, weekIndex) => (
                   <tr key={weekIndex}>
                     {calendarData.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day, dayIndex) => {

@@ -74,7 +74,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
 
-    // Also clear any other auth-related items that might exist
     localStorage.removeItem("accessToken");
 
     setAuthState({
@@ -109,7 +108,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Initialize auth state from localStorage
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -139,7 +137,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
           console.log("✅ Auth: Initial auth state set to authenticated");
 
-          // Validate token by fetching user profile
           try {
             console.log("🔍 Auth: Validating token with server...");
             const response = await apiClient.getUserProfile();
@@ -155,14 +152,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           } catch (error) {
             console.error("❌ Auth: Token validation failed:", error);
-            // Token might be expired, try to refresh
             try {
               console.log("🔄 Auth: Attempting token refresh...");
               await refreshAuthToken();
               console.log("✅ Auth: Token refresh successful");
             } catch (refreshError) {
               console.error("❌ Auth: Token refresh failed:", refreshError);
-              // Refresh failed, clear auth state
               clearAuth();
             }
           }
@@ -199,7 +194,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("📡 Auth: API response received:", response);
 
       if (response.success) {
-        // Backend returns { success, user, accessToken, refreshToken } directly
         const { user, accessToken, refreshToken } = response;
         console.log("👤 Auth: User data:", user);
         console.log(
@@ -209,7 +203,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           !!refreshToken
         );
 
-        // Store in localStorage
         localStorage.setItem("token", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
@@ -223,7 +216,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
         console.log("✅ Auth: Login successful, state updated");
 
-        // Small delay to ensure state is updated before redirect
         await new Promise((resolve) => setTimeout(resolve, 100));
       } else {
         console.error("❌ Auth: Login response not successful:", response);
@@ -249,7 +241,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await apiClient.register(userData);
 
       if (response.success) {
-        // Successful registration - don't auto-login, let user login manually
         setAuthState((prev) => ({ ...prev, isLoading: false }));
       } else {
         throw new Error(response.message || "Registration failed");
@@ -269,7 +260,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {
-      // Always clear local state regardless of API response
       clearAuth();
     }
   };

@@ -155,7 +155,7 @@ class ApiClient {
         ...this.getAuthHeaders(),
         ...options.headers,
       },
-      credentials: "include", // Important for cookies
+      credentials: "include",
     };
 
     try {
@@ -164,7 +164,6 @@ class ApiClient {
     } catch (error) {
       console.error("API Error:", error);
 
-      // Provide more specific error messages
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         throw new Error(
           "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan di port 5000."
@@ -185,7 +184,6 @@ class ApiClient {
       hasPassword: !!credentials.password,
     });
 
-    // Login response tidak menggunakan format ApiResponse biasa
     const url = `${this.baseURL}/auth/login`;
     const config: RequestInit = {
       method: "POST",
@@ -375,7 +373,6 @@ class ApiClient {
       method: "POST",
       headers: {
         ...this.getAuthHeadersOnly(),
-        // Jangan set Content-Type, biar browser yang set (multipart)
       },
       credentials: "include",
       body: formData,

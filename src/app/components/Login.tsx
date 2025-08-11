@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import styles from "../styles/login.module.css";
 import Link from "next/link";
@@ -21,7 +20,6 @@ export default function Login() {
     const message = searchParams.get("message");
     if (message) {
       setSuccessMessage(message);
-      // Clear the URL parameter after showing the message
       router.replace("/login");
     }
   }, [searchParams, router]);
@@ -40,10 +38,8 @@ export default function Login() {
       await login(email, password);
       console.log("✅ Login successful, redirecting to dashboard...");
 
-      // Wait a bit for state to be properly set
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Use router.replace instead of push to avoid back button issues
       router.replace("/dashboard");
     } catch (error) {
       console.error("❌ Login failed:", error);

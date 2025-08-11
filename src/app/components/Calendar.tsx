@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import apiClient, { CalendarDay, CalendarWeek } from "../../utils/apiClient";
 import LoadingSpinner from "./LoadingSpinner";
@@ -68,7 +67,6 @@ export default function Calendar({ onDateSelect }: CalendarProps) {
         const response = await apiClient.getCalendar(currentMonth, currentYear);
 
         if (response.success && response.data) {
-          // Flatten the weeks structure to get all days
           const allDays: CalendarDay[] = [];
           if (response.data.weeks) {
             response.data.weeks.forEach((week: CalendarWeek) => {

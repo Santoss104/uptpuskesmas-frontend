@@ -82,13 +82,11 @@ export default function PatientList() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Format otomatis no pendaftaran
   function formatRegistrationNumber(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 8); // Limit to 8 digits
     return digits.match(/.{1,2}/g)?.join(".") ?? "";
   }
 
-  // Universal confirm modal
   function openConfirmModal({
     title,
     message,
@@ -225,7 +223,6 @@ export default function PatientList() {
     if (!form.birthPlace.trim()) errors.push("Tempat lahir harus diisi");
     if (!form.birthDay) errors.push("Tanggal lahir harus diisi");
 
-    // Validate registration number format (should be numbers with dots)
     const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2}$/;
     if (
       form.registrationNumber &&
@@ -395,7 +392,6 @@ export default function PatientList() {
       onConfirm: async () => {
         setConfirmModal((prev) => prev && { ...prev, loading: true });
         try {
-          // Import data pasien dari Excel
           const response = await apiClient.importPatientsFromExcel(formData);
           if (response.success) {
             showToast(

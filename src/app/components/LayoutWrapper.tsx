@@ -1,5 +1,4 @@
 "use client";
-
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Sidebar from "./Sidebar";
@@ -43,7 +42,6 @@ export default function LayoutWrapper({
     return <LoadingSpinner message="Memuat aplikasi..." />;
   }
 
-  // If it's an auth page, show without sidebar/header
   if (isAuthPage) {
     console.log("🚪 LayoutWrapper: Showing auth page layout");
     return <main>{children}</main>;

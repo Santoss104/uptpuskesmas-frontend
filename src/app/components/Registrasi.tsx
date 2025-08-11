@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import styles from "../styles/login.module.css";
 import Link from "next/link";
@@ -19,7 +18,6 @@ export default function SignUp() {
     e.preventDefault();
     setError("");
 
-    // Basic validation
     if (!email || !password || !confirmPassword) {
       setError("Semua field harus diisi");
       return;
@@ -37,7 +35,6 @@ export default function SignUp() {
 
     try {
       await register({ email, password, confirmPassword });
-      // Redirect to login page with success message
       router.push(
         "/login?message=Registrasi berhasil! Silakan login dengan akun yang baru dibuat."
       );

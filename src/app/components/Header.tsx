@@ -1,5 +1,4 @@
 "use client";
-
 import styles from "../styles/header.module.css";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../../utils/auth";
@@ -15,7 +14,6 @@ export default function Header() {
       router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if logout API fails, redirect to login
       router.push("/login");
     }
   };

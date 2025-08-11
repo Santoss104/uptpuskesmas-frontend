@@ -27,7 +27,6 @@ export default function Sidebar() {
       router.replace("/login");
     } catch (error) {
       console.error("Logout error:", error);
-      // Force logout by clearing storage and redirecting
       localStorage.clear();
       router.replace("/login");
     } finally {
@@ -40,11 +39,9 @@ export default function Sidebar() {
     setShowLogout(false);
   };
 
-  // Get user display name and role
   const getUserDisplayName = () => {
     if (!user) return "User";
 
-    // Check for name field variations
     const name =
       user.name || user.displayName || user.email?.split("@")[0] || "User";
     return name;
