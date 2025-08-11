@@ -46,7 +46,7 @@ export default function SignUp() {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#+\-_=])[A-Za-z\d@$!%*?&#+\-_=]{8,}$/;
     if (!passwordRegex.test(password)) {
       setError(
-        "Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&#+\-_=)"
+        "Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&#+-_=)"
       );
       return;
     }
