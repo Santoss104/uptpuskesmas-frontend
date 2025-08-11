@@ -18,6 +18,13 @@ export default function SignUp() {
     e.preventDefault();
     setError("");
 
+    console.log("🔍 Registration form submitted:", {
+      email,
+      passwordLength: password.length,
+      confirmPasswordLength: confirmPassword.length,
+      passwordsMatch: password === confirmPassword,
+    });
+
     if (!email || !password || !confirmPassword) {
       setError("Semua field harus diisi");
       return;
@@ -28,17 +35,28 @@ export default function SignUp() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password harus minimal 6 karakter");
+    // Updated password validation for production requirements
+    if (password.length < 8) {
+      setError("Password harus minimal 8 karakter");
+      return;
+    }
+
+    // Check password complexity for production
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&)");
       return;
     }
 
     try {
+      console.log("🚀 Starting registration process...");
       await register({ email, password, confirmPassword });
+      console.log("✅ Registration successful, redirecting to login...");
       router.push(
         "/login?message=Registrasi berhasil! Silakan login dengan akun yang baru dibuat."
       );
     } catch (error) {
+      console.error("❌ Registration failed:", error);
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -82,7 +100,7 @@ export default function SignUp() {
         <label className={styles.label}>Password</label>
         <input
           type="password"
-          placeholder="Input password"
+          placeholder="Min 8 karakter: huruf besar, kecil, angka, simbol"
           className={styles.input}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -93,7 +111,7 @@ export default function SignUp() {
         <label className={styles.label}>Confirm Password</label>
         <input
           type="password"
-          placeholder="Input password again"
+          placeholder="Ulangi password yang sama"
           className={styles.input}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}

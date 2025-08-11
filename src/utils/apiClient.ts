@@ -268,10 +268,31 @@ class ApiClient {
     confirmPassword: string;
     avatar?: string;
   }) {
-    return this.makeRequest<{ user: User }>("/auth/registration", {
-      method: "POST",
-      body: JSON.stringify(userData),
+    console.log("🌐 ApiClient: Sending registration request:", {
+      email: userData.email,
+      hasPassword: !!userData.password,
+      hasConfirmPassword: !!userData.confirmPassword,
+      passwordsMatch: userData.password === userData.confirmPassword,
+      apiUrl: this.baseURL,
     });
+
+    try {
+      const response = await this.makeRequest<{ user: User }>("/auth/registration", {
+        method: "POST",
+        body: JSON.stringify(userData),
+      });
+
+      console.log("📨 ApiClient: Registration response:", {
+        success: response.success,
+        message: response.message,
+        hasUser: !!response.data?.user,
+      });
+
+      return response;
+    } catch (error) {
+      console.error("💥 ApiClient: Registration error:", error);
+      throw error;
+    }
   }
 
   async logout() {

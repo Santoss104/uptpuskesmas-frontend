@@ -238,14 +238,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true }));
 
+      console.log("🌐 Auth: Starting registration with data:", {
+        email: userData.email,
+        hasPassword: !!userData.password,
+        hasConfirmPassword: !!userData.confirmPassword,
+        passwordMatch: userData.password === userData.confirmPassword,
+      });
+
       const response = await apiClient.register(userData);
+
+      console.log("📨 Auth: Registration response received:", {
+        success: response.success,
+        message: response.message,
+        hasUser: !!response.data?.user,
+      });
 
       if (response.success) {
         setAuthState((prev) => ({ ...prev, isLoading: false }));
+        console.log("✅ Auth: Registration successful");
       } else {
+        console.error("❌ Auth: Registration failed - server returned false");
         throw new Error(response.message || "Registration failed");
       }
     } catch (error) {
+      console.error("💥 Auth: Registration error:", error);
       setAuthState((prev) => ({ ...prev, isLoading: false }));
       throw error;
     }
