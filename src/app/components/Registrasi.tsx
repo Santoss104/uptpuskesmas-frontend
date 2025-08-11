@@ -43,10 +43,10 @@ export default function SignUp() {
 
     // Check password complexity for production
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#+\-_=])[A-Za-z\d@$!%*?&#+\-_=]{8,}$/;
     if (!passwordRegex.test(password)) {
       setError(
-        "Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&)"
+        "Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&#+\-_=)"
       );
       return;
     }
@@ -103,7 +103,7 @@ export default function SignUp() {
         <label className={styles.label}>Password</label>
         <input
           type="password"
-          placeholder="Min 8 karakter: huruf besar, kecil, angka, simbol"
+          placeholder="Min 8 karakter: huruf besar, kecil, angka, simbol (@$!%*?&#+\-_=)"
           className={styles.input}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
