@@ -277,10 +277,13 @@ class ApiClient {
     });
 
     try {
-      const response = await this.makeRequest<{ user: User }>("/auth/registration", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
+      const response = await this.makeRequest<{ user: User }>(
+        "/auth/registration",
+        {
+          method: "POST",
+          body: JSON.stringify(userData),
+        }
+      );
 
       console.log("📨 ApiClient: Registration response:", {
         success: response.success,

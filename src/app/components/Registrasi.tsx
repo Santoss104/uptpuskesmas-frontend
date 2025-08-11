@@ -42,9 +42,12 @@ export default function SignUp() {
     }
 
     // Check password complexity for production
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      setError("Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&)");
+      setError(
+        "Password harus mengandung minimal: 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus (@$!%*?&)"
+      );
       return;
     }
 
