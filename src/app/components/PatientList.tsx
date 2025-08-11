@@ -7,6 +7,7 @@ import modalStyles from "../styles/modal.module.css";
 import ConfirmModal from "./ConfirmModal";
 import CustomSelect from "./CustomSelect";
 import apiClient from "../../utils/apiClient";
+import { useAuth, isAdmin } from "../../utils/auth";
 
 interface Patient {
   _id: string;
@@ -31,6 +32,8 @@ const PAGE_SIZE = 10;
 const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 export default function PatientList() {
+  const { user } = useAuth();
+  const userIsAdmin = isAdmin(user);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -532,28 +535,32 @@ export default function PatientList() {
           )}
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={openModal} className={styles["add-button"]}>
-            + Tambah Pasien
-          </button>
-          <button onClick={handleExport} className={styles["export-button"]}>
-            Export Excel
-          </button>
-          <button
-            onClick={handleDownloadTemplate}
-            className={styles["template-button"]}
-          >
-            Download Template
-          </button>
-          <label className={styles["import-label"]}>
-            Import Excel
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              style={{ display: "none" }}
-              ref={fileInputRef}
-              onChange={handleImport}
-            />
-          </label>
+          {userIsAdmin && (
+            <>
+              <button onClick={openModal} className={styles["add-button"]}>
+                + Tambah Pasien
+              </button>
+              <button onClick={handleExport} className={styles["export-button"]}>
+                Export Excel
+              </button>
+              <button
+                onClick={handleDownloadTemplate}
+                className={styles["template-button"]}
+              >
+                Download Template
+              </button>
+              <label className={styles["import-label"]}>
+                Import Excel
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  style={{ display: "none" }}
+                  ref={fileInputRef}
+                  onChange={handleImport}
+                />
+              </label>
+            </>
+          )}
         </div>
       </div>
 
@@ -568,7 +575,7 @@ export default function PatientList() {
               <th>No. Pendaftaran</th>
               <th>Tempat Lahir</th>
               <th>Tanggal Lahir</th>
-              <th>Aksi</th>
+              {userIsAdmin && <th>Aksi</th>}
             </tr>
           </thead>
           <tbody>
@@ -581,26 +588,28 @@ export default function PatientList() {
                   <td>{patient.registrationNumber}</td>
                   <td>{patient.birthPlace}</td>
                   <td>{formatDate(patient.birthDay)}</td>
-                  <td>
-                    <button
-                      onClick={() => openEditModal(patient)}
-                      className={styles["edit-button"]}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(patient._id, patient.name)}
-                      className={styles["delete-button"]}
-                    >
-                      Hapus
-                    </button>
-                  </td>
+                  {userIsAdmin && (
+                    <td>
+                      <button
+                        onClick={() => openEditModal(patient)}
+                        className={styles["edit-button"]}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(patient._id, patient.name)}
+                        className={styles["delete-button"]}
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={userIsAdmin ? 7 : 6}
                   style={{ textAlign: "center", padding: "20px" }}
                 >
                   {search || alphabet
