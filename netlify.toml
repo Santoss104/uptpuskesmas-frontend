@@ -1,0 +1,22 @@
+[build]
+  publish = "out"
+  command = "npm run build"
+
+[build.environment]
+  NEXT_PUBLIC_API_BASE_URL = "https://puskesmas-backend-api.fly.dev/api/v1"
+  NODE_ENV = "production"
+
+# SPA redirect untuk client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers untuk security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
