@@ -1,44 +1,138 @@
-import React from "react";
-import styles from "../styles/dashboard.module.css";
+"use client";
 
-const patients = [
-  {
-    id: "001",
-    name: "Ahmad Subhan",
-    alamat: "Jl. Merdeka No. 15, Jakarta",
-    nomor: "REG001",
-    lahir: "15 Jan 1985",
-    status: "Fever",
-  },
-  {
-    id: "002",
-    name: "Siti Aminah",
-    alamat: "Jl. Sudirman No. 25, Bandung",
-    nomor: "REG002", 
-    lahir: "23 Mar 1990",
-    status: "Cholera",
-  },
-  {
-    id: "003",
-    name: "Budi Santoso",
-    alamat: "Jl. Gatot Subroto No. 8, Surabaya",
-    nomor: "REG003",
-    lahir: "10 Jul 1988",
-    status: "Fever",
-  },
-];
+import React, { useEffect, useState } from "react";
+import styles from "../styles/dashboard.module.css";
+import apiClient, { CalendarDay, CalendarWeek } from "../../utils/apiClient";
+import LoadingSpinner from "./LoadingSpinner";
+import { useAuth } from "../../utils/auth";
+
+interface Patient {
+  _id: string;
+  name: string;
+  address: string;
+  registrationNumber: string;
+  birthPlace: string;
+  birthDay: string;
+  createdAt: string;
+}
+
+interface PatientStatistics {
+  totalPatients: number;
+  statistics: {
+    averageAge: number;
+    genderDistribution: Record<string, number>;
+    commonAddresses: Array<{ _id: string; count: number }>;
+    registrationTrends: Record<string, number>;
+  };
+}
 
 export default function Dashboard() {
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [statistics, setStatistics] = useState<PatientStatistics | null>(null);
+  const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  const monthNames = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+
+  useEffect(() => {
+    // Only fetch data if user is authenticated and not loading
+    if (!authLoading && !isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
+    if (!authLoading && isAuthenticated) {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+
+          // Fetch recent patients (limit to first 5)
+          const patientsResponse = await apiClient.getPatients({
+            page: 1,
+            limit: 5,
+            sortBy: "createdAt",
+            sortOrder: "desc",
+          });
+
+          if (patientsResponse.success && patientsResponse.data) {
+            setPatients(patientsResponse.data.patients);
+          }
+
+          // Fetch statistics
+          const statsResponse = await apiClient.getPatientStatistics();
+          if (statsResponse.success && statsResponse.data) {
+            setStatistics(statsResponse.data);
+          }
+
+          // Fetch calendar data
+          const calendarResponse = await apiClient.getCalendar(currentMonth, currentYear);
+          if (calendarResponse.success && calendarResponse.data) {
+            // Flatten the weeks structure to get all days
+            const allDays: CalendarDay[] = [];
+            if (calendarResponse.data.weeks) {
+              calendarResponse.data.weeks.forEach((week: CalendarWeek) => {
+                if (week.days) {
+                  allDays.push(...week.days);
+                }
+              });
+            }
+            setCalendarData(allDays);
+          }
+        } catch (error) {
+          console.error("Dashboard data fetch error:", error);
+          setError("Gagal memuat data dashboard");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }
+  }, [authLoading, isAuthenticated, currentMonth, currentYear]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (loading) {
+    return <LoadingSpinner message="Memuat data dashboard..." />;
+  }
+
+  if (error) {
+    return (
+      <div className={styles["dashboard-bg"]}>
+        <div style={{ textAlign: "center", padding: "50px", color: "red" }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={styles["dashboard-bg"]}>
       <div className={styles["dashboard-title"]}>Dashboard</div>
 
       {/* Statistik Card */}
       <div className={styles["stat-card"]}>
-        <span className={`material-icons ${styles["stat-icon"]}`}>calendar_month</span>
+        <span className={`material-icons ${styles["stat-icon"]}`}>
+          calendar_month
+        </span>
         <div>
-          <div className={styles["stat-info-title"]}>250</div>
-          <div className={styles["stat-info-desc"]}>Total Data</div>
+          <div className={styles["stat-info-title"]}>
+            {statistics?.totalPatients || 0}
+          </div>
+          <div className={styles["stat-info-desc"]}>Total Data Pasien</div>
         </div>
       </div>
 
@@ -46,37 +140,50 @@ export default function Dashboard() {
       <div className={styles["dashboard-main"]}>
         {/* Table */}
         <div className={styles["table-card"]}>
-          <div className={styles["table-title"]}>Nama Pasien</div>
+          <div className={styles["table-title"]}>Pasien Terbaru</div>
           <table className={styles["dashboard-table"]}>
             <thead>
               <tr>
-                <th>No. </th>
-                <th>Patient Name</th>
+                <th>No.</th>
+                <th>Nama Pasien</th>
                 <th>Alamat</th>
-                <th>Nomor Pendaftaran</th>
+                <th>No. Pendaftaran</th>
                 <th>Tanggal Lahir</th>
               </tr>
             </thead>
             <tbody>
-              {patients.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>
-                    <a className={styles["link"]}>{p.name}</a>
+              {patients.length > 0 ? (
+                patients.map((p, index) => (
+                  <tr key={p._id}>
+                    <td>{index + 1}</td>
+                    <td>
+                      <a className={styles["link"]}>{p.name}</a>
+                    </td>
+                    <td>
+                      <a className={styles["link"]}>{p.address}</a>
+                    </td>
+                    <td>{p.registrationNumber}</td>
+                    <td>{formatDate(p.birthDay)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={5}
+                    style={{ textAlign: "center", padding: "20px" }}
+                  >
+                    Tidak ada data pasien
                   </td>
-                  <td>
-                    <a className={styles["link"]}>{p.alamat}</a>
-                  </td>
-                  <td>{p.nomor}</td>
-                  <td>{p.lahir}</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
         {/* Calendar */}
         <div className={styles["calendar-card"]}>
-          <div className={styles["calendar-title"]}>January</div>
+          <div className={styles["calendar-title"]}>
+            {monthNames[currentMonth - 1]} {currentYear}
+          </div>
           <table className={styles["calendar-table"]}>
             <thead>
               <tr>
@@ -90,23 +197,39 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
-              </tr>
-              <tr>
-                <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
-              </tr>
-              <tr>
-                <td>13</td><td>14</td>
-                <td className={styles["today"]}>15</td>
-                <td>16</td><td>17</td><td>18</td><td>19</td>
-              </tr>
-              <tr>
-                <td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td>
-              </tr>
-              <tr>
-                <td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td>
-              </tr>
+              {calendarData && calendarData.length > 0 ? (
+                // Group days into weeks (7 days each)
+                Array.from({ length: Math.ceil(calendarData.length / 7) }, (_, weekIndex) => (
+                  <tr key={weekIndex}>
+                    {calendarData.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day, dayIndex) => {
+                      const today = new Date();
+                      const isToday =
+                        day.date === today.getDate() &&
+                        currentMonth === today.getMonth() + 1 &&
+                        currentYear === today.getFullYear() &&
+                        day.isCurrentMonth;
+
+                      return (
+                        <td
+                          key={weekIndex * 7 + dayIndex}
+                          className={isToday ? styles["today"] : ""}
+                          style={{
+                            opacity: day.isCurrentMonth ? 1 : 0.3,
+                          }}
+                        >
+                          {day.date}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "20px" }}>
+                    Memuat kalender...
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

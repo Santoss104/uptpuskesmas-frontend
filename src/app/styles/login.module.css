@@ -147,6 +147,28 @@
   text-decoration: underline;
 }
 
+.error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #ffcdd2;
+}
+
+.success {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #c8e6c9;
+}
+
 /* Responsive design */
 @media (max-width: 480px) {
   .form {

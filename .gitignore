@@ -9,9 +9,15 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+package-lock.json
+yarn.lock
+.pnpm-lock.yaml
 
 # testing
 /coverage
+/playwright-report
+/test-results
+/e2e-results
 
 # next.js
 /.next/
@@ -30,8 +36,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files - NEVER COMMIT THESE!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
 
 # vercel
 .vercel
@@ -39,3 +50,44 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Testing files - NEVER COMMIT!
+*test*.html
+test-data/
+screenshots/
+videos/
+
+# Development files - NEVER COMMIT!
+temp-*
+debug-*
+*.temp
+
+# Uploaded files (user data) - NEVER COMMIT!
+public/uploads/
+public/files/
+uploads/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Windows-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS-specific files
+.AppleDouble
+.LSOverride
+._*
+
+# Temporary files
+*.tmp
+.cache/
+.temp/
+temp/
+tmp/

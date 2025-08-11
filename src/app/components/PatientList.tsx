@@ -1,474 +1,854 @@
-'use client';
-import React from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/dashboard.module.css";
+import Toast from "./Toast";
+import LoadingSpinner from "./LoadingSpinner";
+import modalStyles from "../styles/modal.module.css";
+import ConfirmModal from "./ConfirmModal";
+import CustomSelect from "./CustomSelect";
+import apiClient from "../../utils/apiClient";
 
-const patients = [
-  { id: 1, name: "Revi", alamat: "Karya 1", nomor: "0090909090901", lahir: "18-09-2003" },
-  { id: 2, name: "Ikhlas", alamat: "Karya 1", nomor: "0090909090902", lahir: "18-10-2003" },
-  { id: 3, name: "Azizi", alamat: "Karya 1", nomor: "0090909090903", lahir: "12-01-2004" },
-  { id: 4, name: "Rehan", alamat: "Karya 1", nomor: "0090909090904", lahir: "18-09-2004" },
-  { id: 5, name: "Reus", alamat: "Karya 1", nomor: "0090909090905", lahir: "18-09-2004" },
-  { id: 6, name: "Sulton", alamat: "Karya 1", nomor: "0090909090906", lahir: "18-09-2003" },
-  { id: 7, name: "Kepin", alamat: "Karya 1", nomor: "0090909090907", lahir: "18-09-2003" },
-  { id: 8, name: "Ajit", alamat: "Karya 1", nomor: "0090909090908", lahir: "18-09-2003" },
-  { id: 9, name: "Revi", alamat: "Karya 1", nomor: "0090909090901", lahir: "18-09-2003" },
-  { id: 10, name: "Ikhlas", alamat: "Karya 1", nomor: "0090909090902", lahir: "18-10-2003" },
-  { id: 11, name: "Azizi", alamat: "Karya 1", nomor: "0090909090903", lahir: "12-01-2004" },
-  { id: 12, name: "Rehan", alamat: "Karya 1", nomor: "0090909090904", lahir: "18-09-2004" },
-  { id: 13, name: "Reus", alamat: "Karya 1", nomor: "0090909090905", lahir: "18-09-2004" },
-  { id: 14, name: "Sulton", alamat: "Karya 1", nomor: "0090909090906", lahir: "18-09-2003" },
-  { id: 15, name: "Kepin", alamat: "Karya 1", nomor: "0090909090907", lahir: "18-09-2003" },
-  { id: 16, name: "Ajit", alamat: "Karya 1", nomor: "0090909090908", lahir: "18-09-2003" },
-  // Tambahkan data lebih banyak sesuai kebutuhan
-];
+interface Patient {
+  _id: string;
+  name: string;
+  address: string;
+  registrationNumber: string;
+  birthPlace: string;
+  birthDay: string;
+  createdAt: string;
+}
 
-const PAGE_SIZE = 12;
+interface PaginationData {
+  currentPage: number;
+  totalPages: number;
+  totalPatients: number;
+  patientsPerPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+const PAGE_SIZE = 10;
+const ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 export default function PatientList() {
-  const [page, setPage] = React.useState(1);
-  const [search, setSearch] = React.useState("");
-  const [patientList, setPatientList] = React.useState(patients);
-  const [showModal, setShowModal] = React.useState(false);
-  const [form, setForm] = React.useState({
-    name: "",
-    alamat: "",
-    nomor: "",
-    lahir: ""
-  });
-  const [editModal, setEditModal] = React.useState(false);
-  const [editIdx, setEditIdx] = React.useState<number | null>(null);
-  const [editForm, setEditForm] = React.useState({
-    name: "",
-    alamat: "",
-    nomor: "",
-    lahir: ""
-  });
-
-  // Filter pasien sesuai search
-  const filteredPatients = patientList.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchType, setSearchType] = useState<"name" | "address" | "alphabet">(
+    "name"
   );
+  const [alphabet, setAlphabet] = useState<string>("");
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    loading?: boolean;
+    onConfirm: () => void;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    address: "",
+    registrationNumber: "",
+    birthPlace: "",
+    birthDay: "",
+  });
+  const [editModal, setEditModal] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    address: "",
+    registrationNumber: "",
+    birthPlace: "",
+    birthDay: "",
+  });
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const totalPages = Math.ceil(filteredPatients.length / PAGE_SIZE);
-  const paginatedPatients = filteredPatients.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const handlePrev = () => {
-    if (page > 1) setPage(page - 1);
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   };
 
-  const handleNext = () => {
-    if (page < totalPages) setPage(page + 1);
+  // Format otomatis no pendaftaran
+  function formatRegistrationNumber(value: string) {
+    const digits = value.replace(/\D/g, "").slice(0, 8); // Limit to 8 digits
+    return digits.match(/.{1,2}/g)?.join(".") ?? "";
+  }
+
+  // Universal confirm modal
+  function openConfirmModal({
+    title,
+    message,
+    confirmText = "Ya",
+    cancelText = "Batal",
+    onConfirm,
+  }: {
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    onConfirm: () => void;
+  }) {
+    setConfirmModal({
+      open: true,
+      title,
+      message,
+      confirmText,
+      cancelText,
+      loading: false,
+      onConfirm,
+    });
+  }
+
+  // Fetch patients data
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      let response;
+
+      if (searchType === "name" && debouncedSearch.trim()) {
+        response = await apiClient.searchPatientsByName(
+          debouncedSearch.trim(),
+          page,
+          PAGE_SIZE
+        );
+      } else if (searchType === "address" && debouncedSearch.trim()) {
+        response = await apiClient.searchPatientsByAddress(
+          debouncedSearch.trim(),
+          page,
+          PAGE_SIZE
+        );
+      } else if (searchType === "alphabet" && alphabet) {
+        response = await apiClient.getPatientsByAlphabet(
+          alphabet,
+          page,
+          PAGE_SIZE
+        );
+      } else {
+        response = await apiClient.getPatients({
+          page,
+          limit: PAGE_SIZE,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
+      }
+
+      if (response.success && response.data) {
+        setPatients(response.data.patients);
+        setPagination(response.data.pagination);
+      } else {
+        throw new Error(response.message || "Gagal memuat data pasien");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Gagal memuat data pasien";
+      setError(errorMessage);
+      showToast(errorMessage, "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Reset ke halaman 1 jika search berubah
-  React.useEffect(() => {
-    setPage(1);
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [search]);
 
-  const handleCreate = () => {
+  useEffect(() => {
+    fetchPatients();
+    // eslint-disable-next-line
+  }, [page, debouncedSearch, searchType, alphabet]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, searchType, alphabet]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const openModal = () => {
+    setForm({
+      name: "",
+      address: "",
+      registrationNumber: "",
+      birthPlace: "",
+      birthDay: "",
+    });
     setShowModal(true);
   };
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
     setShowModal(false);
-    setForm({ name: "", alamat: "", nomor: "", lahir: "" });
-  };
-
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name || !form.alamat || !form.nomor || !form.lahir) return;
-    const newPatient = {
-      id: patientList.length + 1,
-      name: form.name,
-      alamat: form.alamat,
-      nomor: form.nomor,
-      lahir: form.lahir
-    };
-    setPatientList([newPatient, ...patientList]);
-    handleCloseModal();
-  };
-
-  // Hapus pasien
-  const handleDelete = (id: number) => {
-    setPatientList(patientList.filter((p) => p.id !== id));
-  };
-
-  // Edit pasien
-  const handleEdit = (idx: number) => {
-    setEditIdx(idx);
-    const p = paginatedPatients[idx];
-    setEditForm({
-      name: p.name,
-      alamat: p.alamat,
-      nomor: p.nomor,
-      lahir: p.lahir
+    setForm({
+      name: "",
+      address: "",
+      registrationNumber: "",
+      birthPlace: "",
+      birthDay: "",
     });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate form data
+    const errors: string[] = [];
+
+    if (!form.name.trim()) errors.push("Nama harus diisi");
+    if (!form.address.trim()) errors.push("Alamat harus diisi");
+    if (!form.registrationNumber.trim())
+      errors.push("Nomor pendaftaran harus diisi");
+    if (!form.birthPlace.trim()) errors.push("Tempat lahir harus diisi");
+    if (!form.birthDay) errors.push("Tanggal lahir harus diisi");
+
+    // Validate registration number format (should be numbers with dots)
+    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2}$/;
+    if (
+      form.registrationNumber &&
+      !regNumPattern.test(form.registrationNumber)
+    ) {
+      errors.push("Format nomor pendaftaran harus XX.XX.XX.XX");
+    }
+
+    if (errors.length > 0) {
+      showToast(errors.join(", "), "error");
+      return;
+    }
+
+    openConfirmModal({
+      title: "Konfirmasi Tambah",
+      message: "Apakah Anda yakin ingin menambah pasien ini?",
+      confirmText: "Tambah",
+      cancelText: "Batal",
+      onConfirm: async () => {
+        setConfirmModal((prev) => prev && { ...prev, loading: true });
+        try {
+          const response = await apiClient.createPatient(form);
+          if (response.success) {
+            showToast("Pasien berhasil ditambahkan!", "success");
+            closeModal();
+            fetchPatients();
+          }
+        } catch (error) {
+          showToast(
+            "Gagal menambahkan pasien: " +
+              (error instanceof Error ? error.message : "Unknown error"),
+            "error"
+          );
+        } finally {
+          setConfirmModal(null);
+        }
+      },
+    });
+  };
+
+  const openEditModal = (patient: Patient) => {
+    setEditForm({
+      name: patient.name,
+      address: patient.address,
+      registrationNumber: patient.registrationNumber,
+      birthPlace: patient.birthPlace,
+      birthDay: patient.birthDay.split("T")[0],
+    });
+    setEditId(patient._id);
     setEditModal(true);
   };
 
-  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  const closeEditModal = () => {
+    setEditModal(false);
+    setEditForm({
+      name: "",
+      address: "",
+      registrationNumber: "",
+      birthPlace: "",
+      birthDay: "",
+    });
+    setEditId(null);
   };
 
-  const handleEditFormSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editIdx === null) return;
-    // Cari index asli di patientList
-    const realIdx = patientList.findIndex((p) => p.id === paginatedPatients[editIdx].id);
-    if (realIdx === -1) return;
-    const updated = [...patientList];
-    updated[realIdx] = {
-      ...updated[realIdx],
-      name: editForm.name,
-      alamat: editForm.alamat,
-      nomor: editForm.nomor,
-      lahir: editForm.lahir
-    };
-    setPatientList(updated);
-    setEditModal(false);
-    setEditIdx(null);
+    if (
+      !editId ||
+      !editForm.name ||
+      !editForm.address ||
+      !editForm.registrationNumber ||
+      !editForm.birthPlace ||
+      !editForm.birthDay
+    ) {
+      showToast("Semua field harus diisi!", "error");
+      return;
+    }
+    openConfirmModal({
+      title: "Konfirmasi Update",
+      message: "Apakah Anda yakin ingin mengupdate data pasien ini?",
+      confirmText: "Update",
+      cancelText: "Batal",
+      onConfirm: async () => {
+        setConfirmModal((prev) => prev && { ...prev, loading: true });
+        try {
+          const response = await apiClient.updatePatient(editId, editForm);
+          if (response.success) {
+            showToast("Pasien berhasil diupdate!", "success");
+            closeEditModal();
+            fetchPatients();
+          }
+        } catch (error) {
+          showToast(
+            "Gagal mengupdate pasien: " +
+              (error instanceof Error ? error.message : "Unknown error"),
+            "error"
+          );
+        } finally {
+          setConfirmModal(null);
+        }
+      },
+    });
   };
 
-  const handleCloseEditModal = () => {
-    setEditModal(false);
-    setEditIdx(null);
+  const handleDelete = (id: string, name: string) => {
+    openConfirmModal({
+      title: "Konfirmasi Hapus",
+      message: `Apakah Anda yakin ingin menghapus pasien "${name}"?`,
+      confirmText: "Hapus",
+      cancelText: "Batal",
+      onConfirm: async () => {
+        setConfirmModal((prev) => prev && { ...prev, loading: true });
+        try {
+          const response = await apiClient.deletePatient(id);
+          if (response.success) {
+            showToast("Pasien berhasil dihapus!", "success");
+            fetchPatients();
+          }
+        } catch (error) {
+          showToast(
+            "Gagal menghapus pasien: " +
+              (error instanceof Error ? error.message : "Unknown error"),
+            "error"
+          );
+        } finally {
+          setConfirmModal(null);
+        }
+      },
+    });
   };
 
-  return (
-    <div
-      className={styles["table-card"]}
-      style={{
-        minHeight: "calc(100vh - 60px)",
-        height: "calc(100vh - 60px)",
-        background: "#fff",
-        borderRadius: 16,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-      }}
-    >
-      <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div className={styles["table-title"]} style={{ fontSize: 18 }}>
-          Daftar Nama Pasien Puskesmas Pandau Jaya
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="text"
-            placeholder="Cari nama pasien..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: "6px 12px",
-              borderRadius: 8,
-              border: "1px solid #e8eafc",
-              fontSize: 13,
-              width: 180,
-            }}
-          />
-          <button
-            style={{
-              padding: "6px 16px",
-              borderRadius: 8,
-              border: "none",
-              background: "#a78bfa",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: "pointer"
-            }}
-            onClick={() => alert("Export data pasien!")}
-          >
-            Export
-          </button>
-          <button
-            style={{
-              padding: "6px 16px",
-              borderRadius: 8,
-              border: "none",
-              background: "#2563eb",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: "pointer"
-            }}
-            onClick={() => alert("Import data pasien!")}
-          >
-            Import
-          </button>
-          <button
-            style={{
-              padding: "6px 16px",
-              borderRadius: 8,
-              border: "none",
-              background: "#4ade80",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: "pointer"
-            }}
-            onClick={handleCreate}
-          >
-            Create
+  // Export Excel
+  const handleExport = async () => {
+    try {
+      const res = await apiClient.exportPatientsToExcel();
+      const blob = new Blob([res], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `patients_data_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      showToast("Data pasien berhasil diexport!", "success");
+    } catch {
+      showToast("Gagal export data pasien", "error");
+    }
+  };
+
+  // Import Excel
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("excelFile", file);
+
+    openConfirmModal({
+      title: "Konfirmasi Import",
+      message: "Apakah Anda yakin ingin mengimport data pasien dari file ini?",
+      confirmText: "Import",
+      cancelText: "Batal",
+      onConfirm: async () => {
+        setConfirmModal((prev) => prev && { ...prev, loading: true });
+        try {
+          // Import data pasien dari Excel
+          const response = await apiClient.importPatientsFromExcel(formData);
+          if (response.success) {
+            showToast(
+              "Import selesai: " +
+                (response.results?.success ?? 0) +
+                " berhasil, " +
+                (response.results?.failed ?? 0) +
+                " gagal",
+              "success"
+            );
+            fetchPatients();
+          } else {
+            showToast(
+              "Import gagal: " + (response.message || "Unknown error"),
+              "error"
+            );
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          showToast("Gagal import data pasien", "error");
+        } finally {
+          setConfirmModal(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      },
+    });
+  };
+
+  // Download template
+  const handleDownloadTemplate = async () => {
+    try {
+      const res = await apiClient.downloadExcelTemplate();
+      const blob = new Blob([res], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "patient_import_template.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      showToast("Template berhasil diunduh!", "success");
+    } catch {
+      showToast("Gagal download template", "error");
+    }
+  };
+
+  // Search type change
+  const handleSearchTypeChange = (type: "name" | "address" | "alphabet") => {
+    setSearchType(type);
+    setSearch("");
+    setAlphabet("");
+  };
+
+  // Alphabet search
+  const handleAlphabetClick = (letter: string) => {
+    setSearchType("alphabet");
+    setAlphabet(letter);
+    setSearch("");
+  };
+
+  const changePage = (newPage: number) => {
+    if (pagination && newPage >= 1 && newPage <= pagination.totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  if (loading) {
+    return <LoadingSpinner message="Memuat data pasien..." />;
+  }
+
+  if (error) {
+    return (
+      <div className={styles["dashboard-bg"]}>
+        <div style={{ textAlign: "center", padding: "50px", color: "red" }}>
+          {error}
+          <br />
+          <button onClick={fetchPatients} style={{ marginTop: "10px" }}>
+            Coba Lagi
           </button>
         </div>
       </div>
-      <table
-        className={styles["dashboard-table"]}
-        style={{ fontSize: 13, width: "100%" }}
-      >
-        <thead>
-          <tr>
-            <th style={{ padding: "6px 8px" }}>No</th>
-            <th style={{ padding: "6px 8px" }}>Patient Name</th>
-            <th style={{ padding: "6px 8px" }}>Alamat</th>
-            <th style={{ padding: "6px 8px" }}>Nomor Pendaftaran</th>
-            <th style={{ padding: "6px 8px" }}>Tanggal Lahir</th>
-            <th style={{ padding: "6px 8px" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedPatients.map((p, idx) => (
-            <tr key={p.id}>
-              <td style={{ padding: "6px 8px" }}>
-                {(page - 1) * PAGE_SIZE + idx + 1}
-              </td>
-              <td style={{ color: "#2563eb", fontWeight: 600, padding: "6px 8px" }}>{p.name}</td>
-              <td style={{ padding: "6px 8px" }}>{p.alamat}</td>
-              <td style={{ padding: "6px 8px" }}>{p.nomor}</td>
-              <td style={{ padding: "6px 8px" }}>{p.lahir}</td>
-              <td style={{ padding: "6px 8px" }}>
-                <button
-                  className={styles["action-btn"]}
-                  style={{ background: "#4ade80", fontSize: 13, marginRight: 4 }}
-                  onClick={() => handleEdit(idx)}
-                >
-                  <span className="material-icons">edit</span>
-                </button>
-                <button
-                  className={styles["action-btn"]}
-                  style={{ background: "#ff4444ff", fontSize: 13 }}
-                  onClick={() => handleDelete(p.id)}
-                >
-                  <span className="material-icons">delete</span>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    );
+  }
 
-      {/* Modal Create Pasien */}
-      {showModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          background: "rgba(0,0,0,0.2)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999
-        }}>
-          <div style={{
-            background: "#fff",
-            borderRadius: 12,
-            padding: 32,
-            minWidth: 340,
-            boxShadow: "0 2px 16px rgba(0,0,0,0.08)"
-          }}>
-            <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 16 }}>Tambah Pasien Baru</div>
-            <form onSubmit={handleFormSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Nama Pasien"
-                value={form.name}
-                onChange={handleFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <input
-                type="text"
-                name="alamat"
-                placeholder="Alamat"
-                value={form.alamat}
-                onChange={handleFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <input
-                type="text"
-                name="nomor"
-                placeholder="Nomor Pendaftaran"
-                value={form.nomor}
-                onChange={handleFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <input
-                type="date"
-                name="lahir"
-                placeholder="Tanggal Lahir"
-                value={form.lahir}
-                onChange={handleFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button
-                  type="submit"
-                  style={{ background: "#4ade80", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontWeight: 600, fontSize: 13 }}
-                >
-                  Simpan
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  style={{ background: "#e8eafc", color: "#2563eb", border: "none", borderRadius: 8, padding: "8px 16px", fontWeight: 600, fontSize: 13 }}
-                >
-                  Batal
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+  return (
+    <div className={styles["dashboard-bg"]}>
+      <div className={styles["dashboard-title"]}>Daftar Pasien</div>
 
-      {/* Modal Edit Pasien */}
-      {editModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          background: "rgba(0,0,0,0.2)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999
-        }}>
-          <div style={{
-            background: "#fff",
-            borderRadius: 12,
-            padding: 32,
-            minWidth: 340,
-            boxShadow: "0 2px 16px rgba(0,0,0,0.08)"
-          }}>
-            <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 16 }}>Edit Data Pasien</div>
-            <form onSubmit={handleEditFormSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Nama Pasien"
-                value={editForm.name}
-                onChange={handleEditFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <input
-                type="text"
-                name="alamat"
-                placeholder="Alamat"
-                value={editForm.alamat}
-                onChange={handleEditFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <input
-                type="text"
-                name="nomor"
-                placeholder="Nomor Pendaftaran"
-                value={editForm.nomor}
-                onChange={handleEditFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <input
-                type="date"
-                name="lahir"
-                placeholder="Tanggal Lahir"
-                value={editForm.lahir}
-                onChange={handleEditFormChange}
-                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e8eafc", fontSize: 13 }}
-                required
-              />
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+      {/* Search & Add & Export/Import */}
+      <div className={styles["search-add-container"]}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <CustomSelect
+            value={searchType}
+            onChange={(value) =>
+              handleSearchTypeChange(value as "name" | "address" | "alphabet")
+            }
+            options={[
+              { value: "name", label: "Cari Nama" },
+              { value: "address", label: "Cari Alamat" },
+              { value: "alphabet", label: "Cari Alfabet" },
+            ]}
+            placeholder="Pilih jenis pencarian"
+          />
+          {searchType !== "alphabet" ? (
+            <input
+              type="text"
+              placeholder={
+                searchType === "name"
+                  ? "Cari nama pasien..."
+                  : searchType === "address"
+                  ? "Cari alamat pasien..."
+                  : "Cari pasien..."
+              }
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={styles["search-input"]}
+            />
+          ) : (
+            <div className={styles["alphabet-search"]}>
+              {ALPHABETS.map((letter) => (
                 <button
-                  type="submit"
-                  style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontWeight: 600, fontSize: 13 }}
-                >
-                  Simpan
-                </button>
-                <button
+                  key={letter}
                   type="button"
-                  onClick={handleCloseEditModal}
-                  style={{ background: "#e8eafc", color: "#2563eb", border: "none", borderRadius: 8, padding: "8px 16px", fontWeight: 600, fontSize: 13 }}
+                  className={
+                    alphabet === letter
+                      ? styles["alphabet-active"]
+                      : styles["alphabet-button"]
+                  }
+                  onClick={() => handleAlphabetClick(letter)}
                 >
-                  Batal
+                  {letter}
                 </button>
-              </div>
-            </form>
-          </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
-        <span style={{ color: "#888", fontSize: 13 }}>
-          {filteredPatients.length} results found: Showing page {page} of {totalPages}
-        </span>
         <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={openModal} className={styles["add-button"]}>
+            + Tambah Pasien
+          </button>
+          <button onClick={handleExport} className={styles["export-button"]}>
+            Export Excel
+          </button>
           <button
-            style={{
-              background: "#f3f4f6",
-              color: "#888",
-              borderRadius: 6,
-              border: "none",
-              padding: "4px 12px",
-              fontSize: 13,
-            }}
-            onClick={handlePrev}
-            disabled={page === 1}
+            onClick={handleDownloadTemplate}
+            className={styles["template-button"]}
+          >
+            Download Template
+          </button>
+          <label className={styles["import-label"]}>
+            Import Excel
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              style={{ display: "none" }}
+              ref={fileInputRef}
+              onChange={handleImport}
+            />
+          </label>
+        </div>
+      </div>
+
+      {/* Patients Table */}
+      <div className={styles["table-card"]}>
+        <table className={styles["dashboard-table"]}>
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Nama</th>
+              <th>Alamat</th>
+              <th>No. Pendaftaran</th>
+              <th>Tempat Lahir</th>
+              <th>Tanggal Lahir</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {patients.length > 0 ? (
+              patients.map((patient, index) => (
+                <tr key={patient._id}>
+                  <td>{(page - 1) * PAGE_SIZE + index + 1}</td>
+                  <td>{patient.name}</td>
+                  <td>{patient.address}</td>
+                  <td>{patient.registrationNumber}</td>
+                  <td>{patient.birthPlace}</td>
+                  <td>{formatDate(patient.birthDay)}</td>
+                  <td>
+                    <button
+                      onClick={() => openEditModal(patient)}
+                      className={styles["edit-button"]}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(patient._id, patient.name)}
+                      className={styles["delete-button"]}
+                    >
+                      Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={7}
+                  style={{ textAlign: "center", padding: "20px" }}
+                >
+                  {search || alphabet
+                    ? `Tidak ada pasien yang ditemukan`
+                    : "Tidak ada data pasien"}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className={styles["pagination"]}>
+          <button
+            onClick={() => changePage(page - 1)}
+            disabled={!pagination.hasPrevPage}
+            className={styles["pagination-button"]}
           >
             Previous
           </button>
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i + 1}
-              style={{
-                background: page === i + 1 ? "#a78bfa" : "#f3f4f6",
-                color: page === i + 1 ? "#fff" : "#888",
-                borderRadius: 6,
-                border: "none",
-                padding: "4px 12px",
-                fontSize: 13,
-              }}
-              onClick={() => setPage(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
+
+          <span className={styles["pagination-info"]}>
+            Halaman {pagination.currentPage} dari {pagination.totalPages} (
+            {pagination.totalPatients} total pasien)
+          </span>
+
           <button
-            style={{
-              background: "#f3f4f6",
-              color: "#888",
-              borderRadius: 6,
-              border: "none",
-              padding: "4px 12px",
-              fontSize: 13,
-            }}
-            onClick={handleNext}
-            disabled={page === totalPages}
+            onClick={() => changePage(page + 1)}
+            disabled={!pagination.hasNextPage}
+            className={styles["pagination-button"]}
           >
             Next
           </button>
         </div>
-      </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Add Patient Modal */}
+      {showModal && (
+        <div className={modalStyles.overlay}>
+          <div className={modalStyles.modal}>
+            <h3
+              style={{
+                margin: "0 0 24px 0",
+                fontSize: "24px",
+                fontWeight: "600",
+                color: "#1e293b",
+                fontFamily: '"Inter", sans-serif',
+              }}
+            >
+              Tambah Pasien Baru
+            </h3>
+            <form onSubmit={handleSubmit}>
+              <div className={styles["form-group"]}>
+                <label>Nama:</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>Alamat:</label>
+                <textarea
+                  value={form.address}
+                  onChange={(e) =>
+                    setForm({ ...form, address: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>No. Pendaftaran:</label>
+                <input
+                  type="text"
+                  value={form.registrationNumber}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      registrationNumber: formatRegistrationNumber(
+                        e.target.value
+                      ),
+                    })
+                  }
+                  maxLength={11}
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>Tempat Lahir:</label>
+                <input
+                  type="text"
+                  value={form.birthPlace}
+                  onChange={(e) =>
+                    setForm({ ...form, birthPlace: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>Tanggal Lahir:</label>
+                <input
+                  type="date"
+                  value={form.birthDay}
+                  onChange={(e) =>
+                    setForm({ ...form, birthDay: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-actions"]}>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className={styles["cancel-button"]}
+                >
+                  Batal
+                </button>
+                <button type="submit" className={styles["submit-button"]}>
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Patient Modal */}
+      {editModal && (
+        <div className={modalStyles.overlay}>
+          <div className={modalStyles.modal}>
+            <h3
+              style={{
+                margin: "0 0 24px 0",
+                fontSize: "24px",
+                fontWeight: "600",
+                color: "#1e293b",
+                fontFamily: '"Inter", sans-serif',
+              }}
+            >
+              Edit Pasien
+            </h3>
+            <form onSubmit={handleEditSubmit}>
+              <div className={styles["form-group"]}>
+                <label>Nama:</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>Alamat:</label>
+                <textarea
+                  value={editForm.address}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, address: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>No. Pendaftaran:</label>
+                <input
+                  type="text"
+                  value={editForm.registrationNumber}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      registrationNumber: formatRegistrationNumber(
+                        e.target.value
+                      ),
+                    })
+                  }
+                  maxLength={11}
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>Tempat Lahir:</label>
+                <input
+                  type="text"
+                  value={editForm.birthPlace}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, birthPlace: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-group"]}>
+                <label>Tanggal Lahir:</label>
+                <input
+                  type="date"
+                  value={editForm.birthDay}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, birthDay: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className={styles["form-actions"]}>
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className={styles["cancel-button"]}
+                >
+                  Batal
+                </button>
+                <button type="submit" className={styles["submit-button"]}>
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Universal Confirm Modal */}
+      {confirmModal && (
+        <ConfirmModal
+          open={confirmModal.open}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmText={confirmModal.confirmText}
+          cancelText={confirmModal.cancelText}
+          loading={confirmModal.loading}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 }

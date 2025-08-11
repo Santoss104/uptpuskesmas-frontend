@@ -4,12 +4,45 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 0 24px 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
 }
+
 .logo {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #4f4f8f;
+  color: #1e293b;
+  font-family: "Inter", sans-serif;
 }
-.userIcon {
-  color: #4f4f8f;
+
+.userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.logoutButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.logoutButton:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.logoutButton:active {
+  transform: translateY(0);
 }

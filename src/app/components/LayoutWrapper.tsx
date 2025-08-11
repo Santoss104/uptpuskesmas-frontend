@@ -1,8 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import LoadingSpinner from "./LoadingSpinner";
+import { useAuth } from "../../utils/auth";
 
 export default function LayoutWrapper({
   children,
@@ -10,11 +13,48 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/login' || pathname === '/registrasi';   
-  if (isAuthPage) {
-    return <main>{children}</main>; // Tanpa Sidebar & Header
+  const router = useRouter();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const isAuthPage = pathname === "/login" || pathname === "/registrasi";
+
+  console.log("🏗️ LayoutWrapper render:", {
+    pathname,
+    isAuthenticated,
+    isLoading,
+    isAuthPage,
+    hasUser: !!user,
+  });
+
+  // Redirect logic
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated && !isAuthPage) {
+        console.log("🔒 Redirecting to login - not authenticated");
+        router.replace("/login");
+      } else if (isAuthenticated && isAuthPage) {
+        console.log("✅ Redirecting to dashboard - already authenticated");
+        router.replace("/dashboard");
+      }
+    }
+  }, [isAuthenticated, isLoading, isAuthPage, router]);
+
+  // Show loading state during auth check
+  if (isLoading) {
+    return <LoadingSpinner message="Memuat aplikasi..." />;
   }
 
+  // If it's an auth page, show without sidebar/header
+  if (isAuthPage) {
+    console.log("🚪 LayoutWrapper: Showing auth page layout");
+    return <main>{children}</main>;
+  }
+
+  // If not authenticated and not on auth page, show loading while redirecting
+  if (!isAuthenticated) {
+    return <LoadingSpinner message="Mengarahkan ke halaman login..." />;
+  }
+
+  console.log("🏠 LayoutWrapper: Showing authenticated layout with sidebar");
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />

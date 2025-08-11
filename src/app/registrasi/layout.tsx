@@ -1,10 +1,12 @@
-// src/app/login/layout.tsx
-export default function RegistrasiLayout({ children }: { children: React.ReactNode }) {
+// src/app/registrasi/layout.tsx
+export default function RegistrasiLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
-      <body>
-        {children} {/* Tanpa Header dan Sidebar */}
-      </body>
-    </html>
+    <div className="auth-layout">
+      {children} {/* Tanpa Header dan Sidebar */}
+    </div>
   );
 }

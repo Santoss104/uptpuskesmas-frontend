@@ -3,19 +3,55 @@
 import React from "react";
 import styles from "../styles/login.module.css";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { useAuth } from "../../utils/auth";
 
 export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [successMessage, setSuccessMessage] = React.useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Check for success message from registration
+  React.useEffect(() => {
+    const message = searchParams.get("message");
+    if (message) {
+      setSuccessMessage(message);
+      // Clear the URL parameter after showing the message
+      router.replace("/login");
+    }
+  }, [searchParams, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Di sini Anda bisa menambahkan logika validasi login
-    if (email && password) {
-      router.push("/dashboard");
+    setError("");
+
+    if (!email || !password) {
+      setError("Email dan password harus diisi");
+      return;
+    }
+
+    try {
+      console.log("🔑 Starting login process...");
+      await login(email, password);
+      console.log("✅ Login successful, redirecting to dashboard...");
+
+      // Wait a bit for state to be properly set
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Use router.replace instead of push to avoid back button issues
+      router.replace("/dashboard");
+    } catch (error) {
+      console.error("❌ Login failed:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Login gagal. Silakan coba lagi.";
+      setError(errorMessage);
     }
   };
 
@@ -48,6 +84,7 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={isLoading}
         />
 
         <label className={styles.label}>Password</label>
@@ -58,10 +95,16 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={isLoading}
         />
 
-        <button type="submit" className={styles.button}>
-          LOGIN
+        {successMessage && (
+          <div className={styles.success}>{successMessage}</div>
+        )}
+        {error && <div className={styles.error}>{error}</div>}
+
+        <button type="submit" className={styles.button} disabled={isLoading}>
+          {isLoading ? "LOADING..." : "LOGIN"}
         </button>
 
         <p className={styles.switchText}>
