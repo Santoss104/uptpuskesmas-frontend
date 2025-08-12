@@ -86,8 +86,24 @@ export default function PatientList() {
   };
 
   function formatRegistrationNumber(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 8); // Limit to 8 digits
-    return digits.match(/.{1,2}/g)?.join(".") ?? "";
+    const digits = value.replace(/\D/g, "").slice(0, 9); // Limit to 9 digits
+    if (digits.length <= 6) {
+      return digits.match(/.{1,2}/g)?.join(".") ?? "";
+    } else if (digits.length <= 8) {
+      // Format: XX.XX.XX.XX (8 digits)
+      return digits.match(/.{1,2}/g)?.join(".") ?? "";
+    } else {
+      // Format: XX.XX.XX.XXX (9 digits)
+      const part1 = digits.slice(0, 2);
+      const part2 = digits.slice(2, 4);
+      const part3 = digits.slice(4, 6);
+      const part4 = digits.slice(6, 9);
+      let formatted = part1;
+      if (part2) formatted += "." + part2;
+      if (part3) formatted += "." + part3;
+      if (part4) formatted += "." + part4;
+      return formatted;
+    }
   }
 
   function openConfirmModal({
@@ -226,12 +242,12 @@ export default function PatientList() {
     if (!form.birthPlace.trim()) errors.push("Tempat lahir harus diisi");
     if (!form.birthDay) errors.push("Tanggal lahir harus diisi");
 
-    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2}$/;
+    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}$/;
     if (
       form.registrationNumber &&
       !regNumPattern.test(form.registrationNumber)
     ) {
-      errors.push("Format nomor pendaftaran harus XX.XX.XX.XX");
+      errors.push("Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX");
     }
 
     if (errors.length > 0) {
@@ -303,6 +319,13 @@ export default function PatientList() {
       showToast("Semua field harus diisi!", "error");
       return;
     }
+
+    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}$/;
+    if (!regNumPattern.test(editForm.registrationNumber)) {
+      showToast("Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX", "error");
+      return;
+    }
+
     openConfirmModal({
       title: "Konfirmasi Update",
       message: "Apakah Anda yakin ingin mengupdate data pasien ini?",
@@ -708,7 +731,8 @@ export default function PatientList() {
                       ),
                     })
                   }
-                  maxLength={11}
+                  maxLength={12}
+                  placeholder="XX.XX.XX.XX atau XX.XX.XX.XXX"
                   required
                 />
               </div>
@@ -801,7 +825,8 @@ export default function PatientList() {
                       ),
                     })
                   }
-                  maxLength={11}
+                  maxLength={12}
+                  placeholder="XX.XX.XX.XX atau XX.XX.XX.XXX"
                   required
                 />
               </div>
