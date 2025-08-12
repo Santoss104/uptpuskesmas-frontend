@@ -247,7 +247,9 @@ export default function PatientList() {
       form.registrationNumber &&
       !regNumPattern.test(form.registrationNumber)
     ) {
-      errors.push("Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX");
+      errors.push(
+        "Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX"
+      );
     }
 
     if (errors.length > 0) {
@@ -322,7 +324,10 @@ export default function PatientList() {
 
     const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}$/;
     if (!regNumPattern.test(editForm.registrationNumber)) {
-      showToast("Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX", "error");
+      showToast(
+        "Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX",
+        "error"
+      );
       return;
     }
 
