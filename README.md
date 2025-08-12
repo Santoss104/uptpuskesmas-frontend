@@ -1,53 +1,220 @@
 # 🏥 Puskesmas Frontend Dashboard
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.4-black)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.1-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.x-teal)](https://tailwindcss.com/)
-[![Material-UI](https://img.shields.io/badge/MUI-7.2-blue)](https://mui.com/)
+Modern web dashboard untuk sistem manajemen pasien puskesmas dengan antarmuka yang responsif dan user-friendly.
 
-**Aplikasi Web Dashboard Puskesmas** - Modern, responsive frontend untuk sistem manajemen pasien dengan antarmuka yang intuitif dan user-friendly.
+## 🚀 Fitur Utama
 
-## 📋 Table of Contents
+- **Responsive Design** - Mobile-first dengan Tailwind CSS
+- **Authentication** - Secure login/logout dengan JWT
+- **Patient Management** - Complete CRUD interface untuk data pasien
+- **Advanced Search** - Real-time search dengan multiple filters
+- **Dashboard Analytics** - Visual charts dan statistics
+- **Data Export** - Excel export untuk reporting
+- **Role-Based UI** - Different interfaces untuk USER dan ADMIN
 
-- [🚀 Features](#-features)
-- [🎨 UI Components](#-ui-components)
-- [🔧 Tech Stack](#-technology-stack)
-- [⚡ Quick Start](#-quick-start)
-- [📁 Project Structure](#-project-structure)
-- [🔧 Development](#-development)
-- [🚀 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
+## 🛠️ Tech Stack
 
-## 🚀 Features
+- **Framework**: Next.js 15 dengan App Router
+- **UI Library**: React 19 dengan TypeScript
+- **Styling**: Tailwind CSS + CSS Modules
+- **Charts**: Chart.js untuk visualisasi data
+- **Forms**: HTML5 forms dengan custom validation
+- **State**: React hooks untuk state management
+- **HTTP Client**: Fetch API dengan custom error handling
 
-### Core Features
-- ✅ **Responsive Design** - Mobile-first approach dengan Tailwind CSS
-- ✅ **Modern UI/UX** - Clean, intuitive interface dengan Material-UI components
-- ✅ **Authentication** - Secure login/logout dengan JWT token management
-- ✅ **Patient Management** - Complete CRUD interface untuk data pasien
-- ✅ **Advanced Search** - Real-time search dengan multiple filters
-- ✅ **Dashboard Analytics** - Visual charts dan statistics overview
-- ✅ **Data Export** - Excel export functionality untuk reporting
+## ⚡ Quick Start
 
-### User Experience
-- 🎯 **Role-Based Access** - Different interfaces untuk USER dan ADMIN
-- ⚡ **Fast Loading** - Optimized dengan Next.js 15 dan React 19
-- 📱 **Mobile Responsive** - Perfect di semua device sizes
-- 🌙 **Modern Styling** - Professional medical theme
-- 🔔 **Toast Notifications** - Real-time feedback untuk user actions
-- 📊 **Data Grid** - Advanced table dengan sorting, pagination, filtering
+### Prerequisites
+
+- Node.js 18+
+- Backend API running (lihat ../backend)
+
+### Installation
+
+1. **Install dependencies**
+
+```bash
+npm install
+```
+
+2. **Environment setup**
+
+```bash
+cp .env.example .env.local
+# Edit .env.local dengan API URL
+```
+
+3. **Run development**
+
+```bash
+npm run dev
+```
+
+4. **Open browser**
+
+```
+http://localhost:3000
+```
+
+### Environment Variables
+
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+
+# Optional: Analytics, etc
+NEXT_PUBLIC_APP_ENV=development
+```
+
+## 📱 Pages & Routes
+
+### Public Routes
+
+- `/login` - Authentication page
+
+### Protected Routes (USER)
+
+- `/dashboard` - Overview statistics dan charts
+- `/pasien` - Patient list dengan search dan filter
+- `/registrasi` - Form registrasi pasien baru
+
+### Admin Routes (ADMIN only)
+
+- `/users` - User management panel
+- `/settings` - System settings
 
 ## 🎨 UI Components
 
-### 📱 Pages & Layouts
-- **Login Page** - Secure authentication dengan form validation
-- **Dashboard** - Overview statistics dan quick actions
-- **Patient List** - Data grid dengan advanced search capabilities
-- **Patient Registration** - Form pendaftaran pasien baru
-- **User Management** - Admin panel untuk user management (ADMIN only)
+### Core Components
 
-### 🧩 Reusable Components
+- **Header** - Navigation dengan user info
+- **Sidebar** - Menu navigation dengan role-based items
+- **Dashboard** - Statistics cards dan charts
+- **PatientList** - Data table dengan pagination
+- **Registrasi** - Patient registration form
+- **Login** - Authentication form
+
+### Utility Components
+
+- **LoadingSpinner** - Loading states
+- **Toast** - Notification system
+- **ConfirmModal** - Confirmation dialogs
+- **CustomSelect** - Enhanced select inputs
+
+## 📊 Features Detail
+
+### Patient Management
+
+- Create, read, update, delete patients
+- Search by nama, alamat, nomor registrasi
+- Filter by alphabet (A-Z)
+- Pagination dengan customizable page size
+- Excel export functionality
+
+### Dashboard Analytics
+
+- Total patients count
+- Today's registrations
+- Monthly statistics
+- Gender distribution charts
+- Age group analysis
+
+### Authentication
+
+- JWT-based login/logout
+- Role-based access control
+- Automatic token refresh
+- Session persistence
+
+## 📁 Project Structure
+
+```
+frontend/
+├── src/app/
+│   ├── components/       # Reusable components
+│   ├── dashboard/        # Dashboard page
+│   ├── login/           # Login page
+│   ├── pasien/          # Patient list page
+│   ├── registrasi/      # Registration page
+│   └── styles/          # CSS modules
+├── public/              # Static assets
+└── utils/               # Helper utilities
+```
+
+## 🎯 Component Architecture
+
+### Page Components
+
+- **layout.tsx** - Root layout dengan providers
+- **page.tsx** - Page components untuk setiap route
+
+### Shared Components
+
+- **Header.tsx** - Top navigation
+- **Sidebar.tsx** - Side navigation
+- **Dashboard.tsx** - Statistics dashboard
+- **PatientList.tsx** - Patient data table
+- **Registrasi.tsx** - Patient form
+
+## 🚀 Production Deployment
+
+**Current Deployment**: [Netlify](https://netlify.com)
+
+### Build Commands
+
+```bash
+npm run build    # Build untuk production
+npm start        # Start production server
+npm run lint     # ESLint checking
+```
+
+### Automatic Deployment
+
+- Deploy otomatis via Git push ke main branch
+- Preview deploys untuk pull requests
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+npm run dev      # Development server
+npm run build    # Production build
+npm start        # Start production server
+npm run lint     # Run ESLint
+npm run type-check # TypeScript checking
+```
+
+### Development Features
+
+- Hot reload dengan Next.js
+- TypeScript checking
+- ESLint code quality
+- Automatic imports sorting
+
+## 🎨 Styling
+
+### CSS Approach
+
+- **Tailwind CSS** - Utility-first untuk rapid development
+- **CSS Modules** - Component-scoped styling
+- **Responsive Design** - Mobile-first breakpoints
+
+### Color Scheme
+
+- Primary: Blue (#4a90e2)
+- Background: Clean whites dan light grays
+- Text: Professional dark grays
+- Success/Error: Standard green/red indicators
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Create feature branch
+3. Follow coding standards
+4. Test pada multiple devices
+5. Create Pull Request
+
 - **Header** - Navigation dengan user profile dan logout
 - **Sidebar** - Menu navigasi dengan role-based visibility
 - **LoadingSpinner** - Consistent loading states
@@ -57,6 +224,7 @@
 - **Calendar** - Date picker dan scheduling interface
 
 ### 🎯 Component Features
+
 - **LayoutWrapper** - Consistent page layouts
 - **Dashboard** - Statistics cards dan charts
 - **PatientList** - Advanced data table dengan export
@@ -64,17 +232,17 @@
 
 ## 🔧 Technology Stack
 
-| Category | Technology | Purpose |
-|----------|------------|---------|
-| **Framework** | Next.js 15.4 | React framework dengan App Router |
-| **Runtime** | React 19.1 | UI library dengan latest features |
-| **Language** | TypeScript | Type-safe development |
-| **Styling** | Tailwind CSS 4.x | Utility-first CSS framework |
-| **UI Library** | Material-UI 7.2 | React components library |
-| **Data Grid** | MUI X Data Grid | Advanced table components |
-| **Icons** | React Icons | Icon library |
-| **Routing** | React Router DOM | Client-side routing |
-| **State Management** | React Context | Global state management |
+| Category             | Technology       | Purpose                           |
+| -------------------- | ---------------- | --------------------------------- |
+| **Framework**        | Next.js 15.4     | React framework dengan App Router |
+| **Runtime**          | React 19.1       | UI library dengan latest features |
+| **Language**         | TypeScript       | Type-safe development             |
+| **Styling**          | Tailwind CSS 4.x | Utility-first CSS framework       |
+| **UI Library**       | Material-UI 7.2  | React components library          |
+| **Data Grid**        | MUI X Data Grid  | Advanced table components         |
+| **Icons**            | React Icons      | Icon library                      |
+| **Routing**          | React Router DOM | Client-side routing               |
+| **State Management** | React Context    | Global state management           |
 
 ## ⚡ Quick Start
 
@@ -128,7 +296,7 @@ NEXT_PUBLIC_APP_NAME=Sistem Informasi Puskesmas
 NEXT_PUBLIC_JWT_EXPIRES_IN=15m
 NEXT_PUBLIC_REFRESH_TOKEN_EXPIRES_IN=7d
 
-# 🎨 UI Configuration  
+# 🎨 UI Configuration
 NEXT_PUBLIC_THEME_PRIMARY_COLOR=#1976d2
 NEXT_PUBLIC_ITEMS_PER_PAGE=10
 ```
@@ -223,12 +391,12 @@ Frontend terhubung dengan backend melalui:
 
 ### 📋 Key Directories Explanation
 
-| Directory | Purpose | Description |
-|-----------|---------|-------------|
-| `app/components/` | UI Components | Reusable React components |
-| `app/styles/` | CSS Modules | Component-specific styles |
-| `utils/` | Utilities | API client, auth context, helpers |
-| `public/` | Static Assets | Images, icons, static files |
+| Directory         | Purpose       | Description                       |
+| ----------------- | ------------- | --------------------------------- |
+| `app/components/` | UI Components | Reusable React components         |
+| `app/styles/`     | CSS Modules   | Component-specific styles         |
+| `utils/`          | Utilities     | API client, auth context, helpers |
+| `public/`         | Static Assets | Images, icons, static files       |
 
 ## 🔧 Development
 
@@ -254,22 +422,24 @@ npx tsc --noEmit
 ### 🔄 Development Workflow
 
 1. **Setup Development Environment**
+
    ```bash
    # Clone and install
    git clone <repository-url>
    cd puskesmas-frontend
    npm install
-   
+
    # Setup environment
    cp .env.example .env.local
    # Edit .env.local with your API configuration
    ```
 
 2. **Start Development**
+
    ```bash
    # Make sure backend is running
    cd ../backend && npm run dev
-   
+
    # In new terminal, start frontend
    npm run dev
    ```
@@ -310,11 +480,11 @@ npm run build && npm start
 const fetchPatients = async () => {
   try {
     setLoading(true);
-    const response = await apiClient.get('/patients');
+    const response = await apiClient.get("/patients");
     setPatients(response.data);
   } catch (error) {
-    showToast('Error fetching patients', 'error');
-    console.error('API Error:', error);
+    showToast("Error fetching patients", "error");
+    console.error("API Error:", error);
   } finally {
     setLoading(false);
   }
@@ -339,6 +509,7 @@ ls -la .next/
 ### 🌐 Deployment Options
 
 #### Vercel (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm install -g vercel
@@ -348,6 +519,7 @@ vercel --prod
 ```
 
 #### Docker Deployment
+
 ```dockerfile
 # Dockerfile example
 FROM node:18-alpine
@@ -364,6 +536,7 @@ CMD ["npm", "start"]
 ```
 
 #### Static Export
+
 ```bash
 # For static hosting
 npm run build
