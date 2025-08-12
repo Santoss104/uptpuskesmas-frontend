@@ -86,14 +86,19 @@ export default function PatientList() {
   };
 
   function formatRegistrationNumber(value: string) {
+    // Extract letters and digits separately
+    const letters = value.replace(/[^A-Z]/g, "").slice(0, 1); // Limit to 1 letter
     const digits = value.replace(/\D/g, "").slice(0, 9); // Limit to 9 digits
+
     if (digits.length <= 6) {
-      return digits.match(/.{1,2}/g)?.join(".") ?? "";
+      const formatted = digits.match(/.{1,2}/g)?.join(".") ?? "";
+      return formatted + (letters ? letters : "");
     } else if (digits.length <= 8) {
-      // Format: XX.XX.XX.XX (8 digits)
-      return digits.match(/.{1,2}/g)?.join(".") ?? "";
+      // Format: XX.XX.XX.XX (8 digits) + optional letter
+      const formatted = digits.match(/.{1,2}/g)?.join(".") ?? "";
+      return formatted + (letters ? letters : "");
     } else {
-      // Format: XX.XX.XX.XXX (9 digits)
+      // Format: XX.XX.XX.XXX (9 digits) + optional letter
       const part1 = digits.slice(0, 2);
       const part2 = digits.slice(2, 4);
       const part3 = digits.slice(4, 6);
@@ -102,7 +107,7 @@ export default function PatientList() {
       if (part2) formatted += "." + part2;
       if (part3) formatted += "." + part3;
       if (part4) formatted += "." + part4;
-      return formatted;
+      return formatted + (letters ? letters : "");
     }
   }
 
@@ -242,13 +247,13 @@ export default function PatientList() {
     if (!form.birthPlace.trim()) errors.push("Tempat lahir harus diisi");
     if (!form.birthDay) errors.push("Tanggal lahir harus diisi");
 
-    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}$/;
+    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}[A-Z]?$/;
     if (
       form.registrationNumber &&
       !regNumPattern.test(form.registrationNumber)
     ) {
       errors.push(
-        "Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX"
+        "Format nomor pendaftaran harus XX.XX.XX.XX, XX.XX.XX.XXX, XX.XX.XX.XX[A-Z], atau XX.XX.XX.XXX[A-Z]"
       );
     }
 
@@ -322,10 +327,10 @@ export default function PatientList() {
       return;
     }
 
-    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}$/;
+    const regNumPattern = /^\d{2}\.\d{2}\.\d{2}\.\d{2,3}[A-Z]?$/;
     if (!regNumPattern.test(editForm.registrationNumber)) {
       showToast(
-        "Format nomor pendaftaran harus XX.XX.XX.XX atau XX.XX.XX.XXX",
+        "Format nomor pendaftaran harus XX.XX.XX.XX, XX.XX.XX.XXX, XX.XX.XX.XX[A-Z], atau XX.XX.XX.XXX[A-Z]",
         "error"
       );
       return;
@@ -736,8 +741,8 @@ export default function PatientList() {
                       ),
                     })
                   }
-                  maxLength={12}
-                  placeholder="XX.XX.XX.XX atau XX.XX.XX.XXX"
+                  maxLength={13}
+                  placeholder="XX.XX.XX.XX, XX.XX.XX.XXX, XX.XX.XX.XX[A-Z], atau XX.XX.XX.XXX[A-Z]"
                   required
                 />
               </div>
@@ -830,8 +835,8 @@ export default function PatientList() {
                       ),
                     })
                   }
-                  maxLength={12}
-                  placeholder="XX.XX.XX.XX atau XX.XX.XX.XXX"
+                  maxLength={13}
+                  placeholder="XX.XX.XX.XX, XX.XX.XX.XXX, XX.XX.XX.XX[A-Z], atau XX.XX.XX.XXX[A-Z]"
                   required
                 />
               </div>
