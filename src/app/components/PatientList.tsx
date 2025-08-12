@@ -143,8 +143,8 @@ export default function PatientList() {
         response = await apiClient.getPatients({
           page,
           limit: PAGE_SIZE,
-          sortBy: "createdAt",
-          sortOrder: "desc",
+          sortBy: "registrationNumber",
+          sortOrder: "asc",
         });
       }
 
