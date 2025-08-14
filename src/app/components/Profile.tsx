@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useAuth } from "../../utils/auth";
 import LoadingSpinner from "./LoadingSpinner";
 import Toast from "./Toast";
@@ -27,49 +27,93 @@ export default function Profile() {
     }, 3000);
   };
 
-  const handleAvatarUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleAvatarUpload = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      showToast("Please select an image file", "error");
-      return;
-    }
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        showToast("Please select an image file", "error");
+        return;
+      }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      showToast("Image size should be less than 5MB", "error");
-      return;
-    }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image size should be less than 5MB", "error");
+        return;
+      }
 
-    setIsUploadingAvatar(true);
-    try {
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const base64String = reader.result as string;
-          await updateAvatar({ avatar: base64String });
-          showToast("Avatar updated successfully", "success");
-        } catch (error) {
-          console.error("Error uploading avatar:", error);
-          const errorMessage =
-            error instanceof Error ? error.message : "Failed to upload avatar";
-          showToast(errorMessage, "error");
-        } finally {
-          setIsUploadingAvatar(false);
-        }
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
-      showToast("Failed to upload avatar", "error");
-      setIsUploadingAvatar(false);
+      setIsUploadingAvatar(true);
+      try {
+        // Convert file to base64
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const base64String = reader.result as string;
+            await updateAvatar({ avatar: base64String });
+            showToast("Avatar updated successfully", "success");
+          } catch (error) {
+            console.error("Error uploading avatar:", error);
+            const errorMessage =
+              error instanceof Error
+                ? error.message
+                : "Failed to upload avatar";
+            showToast(errorMessage, "error");
+          } finally {
+            setIsUploadingAvatar(false);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
+        showToast("Failed to upload avatar", "error");
+        setIsUploadingAvatar(false);
+      }
+    },
+    [updateAvatar]
+  );
+
+  // Memoize avatar component to prevent unnecessary re-renders
+  const avatarComponent = useMemo(() => {
+    if (user?.avatar?.url) {
+      return (
+        <Image
+          src={user.avatar.url}
+          alt="Profile"
+          width={120}
+          height={120}
+          priority
+          className={`${styles.avatarImage} ${
+            isUploadingAvatar ? styles.avatarUploading : ""
+          }`}
+          onLoad={() => {
+            // Ensure smooth transition after image loads
+            const img = document.querySelector(
+              `.${styles.avatarImage}`
+            ) as HTMLImageElement;
+            if (img) {
+              img.style.opacity = "1";
+            }
+          }}
+          style={{
+            opacity: isUploadingAvatar ? "0.7" : "1",
+            transition: "opacity 0.3s ease",
+          }}
+          key={user.avatar.url} // Force re-render only when URL changes
+        />
+      );
     }
-  };
+    return (
+      <div
+        className={`${styles.avatarPlaceholder} ${
+          isUploadingAvatar ? styles.avatarUploading : ""
+        }`}
+      >
+        👤
+      </div>
+    );
+  }, [user?.avatar?.url, isUploadingAvatar]);
 
   if (!user) {
     return (
@@ -96,18 +140,14 @@ export default function Profile() {
           <div className={styles.profileHeader}>
             {/* Avatar */}
             <div className={styles.avatarContainer}>
-              {user.avatar?.url ? (
-                <Image
-                  src={user.avatar.url}
-                  alt="Profile"
-                  width={120}
-                  height={120}
-                  priority
-                  className={styles.avatarImage}
-                />
-              ) : (
-                <div className={styles.avatarPlaceholder}>👤</div>
+              {/* Avatar Loading Overlay */}
+              {isUploadingAvatar && (
+                <div className={styles.avatarLoadingOverlay}>
+                  <LoadingSpinner size="small" />
+                </div>
               )}
+
+              {avatarComponent}
 
               {/* Avatar Upload Button */}
               <input
@@ -116,10 +156,13 @@ export default function Profile() {
                 onChange={handleAvatarUpload}
                 className={styles.avatarInput}
                 id="avatar-upload"
+                disabled={isUploadingAvatar}
               />
               <label
                 htmlFor="avatar-upload"
-                className={styles.avatarUploadButton}
+                className={`${styles.avatarUploadButton} ${
+                  isUploadingAvatar ? styles.uploading : ""
+                }`}
               >
                 {isUploadingAvatar ? (
                   <LoadingSpinner size="small" />

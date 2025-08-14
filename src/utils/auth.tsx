@@ -326,10 +326,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (updatedUser) {
           localStorage.setItem("user", JSON.stringify(updatedUser));
 
-          setAuthState((prev) => ({
-            ...prev,
-            user: updatedUser,
-          }));
+          // Use functional update to prevent unnecessary re-renders
+          setAuthState((prev) => {
+            // Only update if avatar actually changed
+            if (prev.user?.avatar?.url !== updatedUser.avatar?.url) {
+              return {
+                ...prev,
+                user: updatedUser,
+              };
+            }
+            return prev;
+          });
 
           console.log("✅ Avatar updated successfully");
         } else {
