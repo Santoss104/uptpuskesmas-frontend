@@ -1,0 +1,341 @@
+/* Profile Page Styles */
+.container {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrapper {
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Unified Profile Card */
+.profileCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.profileCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #3b82f6;
+}
+
+/* Profile Header Section */
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+/* Avatar Styles */
+.avatarContainer {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #64748b;
+  border: 3px solid #f1f5f9;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  font-size: 2rem;
+  color: #fff;
+}
+
+.avatarInput {
+  display: none;
+}
+
+.avatarUploadButton {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  color: #3b82f6;
+  border: 2px solid #f1f5f9;
+}
+
+.avatarUploadButton:hover {
+  transform: scale(1.1);
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* User Info */
+.userInfo {
+  margin-bottom: 0.5rem;
+}
+
+.userName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.userEmail {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.userRole {
+  display: inline-block;
+  background: #64748b;
+  color: #fff;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 1.25rem 0;
+}
+
+/* Settings Section */
+.settingsSection {
+  text-align: left;
+}
+
+.settingsTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+.settingsTitle::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: #3b82f6;
+  border-radius: 1px;
+}
+
+.settingsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Setting Item */
+.settingItem {
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.settingItem:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.settingInfo {
+  flex: 1;
+}
+
+.settingLabel {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.settingValue {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.settingButton {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 70px;
+}
+
+.settingButton:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.settingButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+/* Loading Spinner Container */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .profileCard {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .profileHeader {
+    margin-bottom: 0.75rem;
+  }
+
+  .avatarContainer {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.5rem;
+  }
+
+  .avatarUploadButton {
+    width: 24px;
+    height: 24px;
+    bottom: 2px;
+    right: 2px;
+  }
+
+  .userName {
+    font-size: 1.3rem;
+  }
+
+  .userEmail {
+    font-size: 0.8rem;
+  }
+
+  .settingsTitle {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .settingItem {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+    padding: 0.75rem;
+  }
+
+  .settingButton {
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .divider {
+    margin: 0.75rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .profileCard {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+
+  .avatarContainer {
+    width: 70px;
+    height: 70px;
+  }
+
+  .userName {
+    font-size: 1.2rem;
+  }
+
+  .userEmail {
+    font-size: 0.75rem;
+  }
+
+  .userRole {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.65rem;
+  }
+
+  .settingsTitle {
+    font-size: 0.95rem;
+  }
+
+  .settingLabel {
+    font-size: 0.8rem;
+  }
+
+  .settingValue {
+    font-size: 0.75rem;
+  }
+}

@@ -481,9 +481,21 @@ class ApiClient {
   }
 
   async updateUserProfile(userData: { name?: string; email?: string }) {
-    return this.makeRequest<{ user: User }>("/users/update-info", {
+    const result = await this.makeRequest<{ user: User }>(
+      "/users/update-info",
+      {
+        method: "PUT",
+        body: JSON.stringify(userData),
+      }
+    );
+
+    return result;
+  }
+
+  async updateAvatar(avatarData: { avatar: string }) {
+    return this.makeRequest<{ user: User }>("/users/update-avatar", {
       method: "PUT",
-      body: JSON.stringify(userData),
+      body: JSON.stringify(avatarData),
     });
   }
 

@@ -91,3 +91,45 @@ $RECYCLE.BIN/
 .temp/
 temp/
 tmp/
+
+# 🚨 SECURITY: Additional Frontend-Specific Files - NEVER COMMIT!
+# Build artifacts
+/.swc/
+.turbo/
+
+# Logs
+logs/
+*.log
+combined.log
+error.log
+
+# Configuration backups
+*.backup
+*.bak
+
+# Environment examples (keep .env.example)
+# .env.example should be committed as template
+
+# Analytics and tracking files
+analytics/
+tracking/
+
+# Source maps (if containing sensitive info)
+*.map.js
+*.map.css
+
+# Performance monitoring
+*.perf
+performance/
+
+# Error reporting
+sentry/
+bugsnag/
+
+# Local SSL certificates
+localhost.pem
+localhost-key.pem
+*.local.pem
+
+# Hot reload files
+.hot-reload/

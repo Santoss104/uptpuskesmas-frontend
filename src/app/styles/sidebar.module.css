@@ -31,6 +31,27 @@
   padding: 16px 0;
 }
 
+.profileLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.profileLink:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+.profileLink:active {
+  transform: translateY(0);
+}
+
 .avatar {
   width: 48px;
   height: 48px;
@@ -124,35 +145,38 @@
   color: #3730a3;
 }
 
-/* Logout Modal Styles */
+/* Logout Modal Styles - Updated to match Header style */
 .logoutModal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .logoutContent {
-  background: #ffffff;
-  border-radius: 12px;
+  background: white;
+  border-radius: 16px;
   padding: 32px;
-  min-width: 320px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  width: 90%;
   text-align: center;
+  border: 1px solid #e2e8f0;
 }
 
 .logoutText {
   font-size: 18px;
-  color: #1f2937;
+  font-weight: 600;
+  color: #1e293b;
   margin-bottom: 24px;
-  font-weight: 500;
+  font-family: "Inter", sans-serif;
 }
 
 .logoutButtons {
@@ -162,33 +186,52 @@
 }
 
 .confirmButton {
-  background: #dc2626;
-  color: #ffffff;
+  background: #ef4444;
+  color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 24px;
-  font-weight: 600;
-  font-size: 14px;
+  border-radius: 10px;
+  padding: 12px 24px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  min-width: 100px;
 }
 
 .confirmButton:hover {
-  background: #b91c1c;
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .cancelButton {
-  background: #f3f4f6;
-  color: #374151;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 24px;
-  font-weight: 600;
-  font-size: 14px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 24px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  min-width: 100px;
 }
 
 .cancelButton:hover {
-  background: #e5e7eb;
+  background: #e2e8f0;
+  color: #475569;
+  transform: translateY(-1px);
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }

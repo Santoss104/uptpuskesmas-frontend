@@ -42,6 +42,7 @@ interface AuthContextType extends AuthState {
   }) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (userData: { name?: string; email?: string }) => Promise<void>;
+  updateAvatar: (avatarData: { avatar: string }) => Promise<void>;
   refreshAuthToken: () => Promise<void>;
 }
 
@@ -303,12 +304,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateAvatar = async (avatarData: {
+    avatar: string;
+  }): Promise<void> => {
+    try {
+      console.log(
+        "🔍 Auth updateAvatar called with avatar data length:",
+        avatarData.avatar.length
+      );
+
+      const response = await apiClient.updateAvatar(avatarData);
+      console.log("🔍 Avatar API response:", response);
+
+      // Handle both response formats from backend
+      const responseWithUser = response as typeof response & { user?: User };
+
+      if (response.success && (response.data || responseWithUser.user)) {
+        const updatedUser = response.data?.user || responseWithUser.user;
+        console.log("🔍 Updated user from avatar API:", updatedUser);
+
+        if (updatedUser) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          setAuthState((prev) => ({
+            ...prev,
+            user: updatedUser,
+          }));
+
+          console.log("✅ Avatar updated successfully");
+        } else {
+          throw new Error("No user data in response");
+        }
+      } else {
+        console.error("❌ Avatar API response not successful:", response);
+        throw new Error(response.message || "Avatar update failed");
+      }
+    } catch (error) {
+      console.error("❌ Error in updateAvatar:", error);
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     ...authState,
     login,
     register,
     logout,
     updateProfile,
+    updateAvatar,
     refreshAuthToken,
   };
 

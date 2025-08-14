@@ -65,23 +65,25 @@ export default function Sidebar() {
       )}
 
       <div className={styles.profile}>
-        <div className={styles.avatar}>
-          {user?.avatar?.url ? (
-            <Image
-              src={user.avatar.url}
-              alt="User Avatar"
-              width={50}
-              height={50}
-              className={styles.avatarImage}
-            />
-          ) : (
-            <span>👤</span>
-          )}
-        </div>
-        <div className={styles.userInfo}>
-          <span className={styles.userName}>{getUserDisplayName()}</span>
-          <span className={styles.role}>{getUserRole()}</span>
-        </div>
+        <Link href="/profile" className={styles.profileLink}>
+          <div className={styles.avatar}>
+            {user?.avatar?.url ? (
+              <Image
+                src={user.avatar.url}
+                alt="User Avatar"
+                width={50}
+                height={50}
+                className={styles.avatarImage}
+              />
+            ) : (
+              <span>👤</span>
+            )}
+          </div>
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>{getUserDisplayName()}</span>
+            <span className={styles.role}>{getUserRole()}</span>
+          </div>
+        </Link>
       </div>
 
       <nav className={styles.nav}>
